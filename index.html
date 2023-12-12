@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="background_color" content="#ffffff" />
+    <meta name="display" content="standalone" />
+    <link type="text/css" rel="stylesheet" href="style.css?v=0.10" />
+    <!-- ICONS -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="images/logo-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="images/logo-16x16.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="images/logo-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="images/logo-512x512.png" />
+    <!-- FONTS -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&amp;family=Roboto:wght@100;300;400;500;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <!-- WEB MANIFEST -->
+    <link rel="manifest" href="webmanifest.json" />
+  </head>
+  <body class="loading mobile">
+    <!-- ITEMS -->
+    <div
+      id="list-items-container"
+      class="scrollable custom-scrollbar list-items-container flex flex-column flex-align-start position-absolute absolute-all-size"
+    >
+      <!-- ITEMS -->
+      <!-- ITEMS -->
+
+      <!-- BUTTON MORE -->
+      <div class="list-finish flex-center p-1">
+        <button class="button-more btn" data-label="loadMore"></button>
+      </div>
+
+      <!-- NO ITEMS -->
+      <div class="list-no-items flex-column flex-align-center flex-justify-space-evenly h-100">
+        <img class="w-100" src="./images/no-items.png" />
+        <button class="button-more btn" data-label="refresh"></button>
+      </div>
+
+      <!-- GOTO TOP -->
+      <div class="goto-top cursor-pointer position-fixed flex flex-center">
+        <svg height="32" width="32" viewBox="0 0 48 48"><path d="M14.15 30.75 12 28.6l12-12 12 11.95-2.15 2.15L24 20.85Z" /></svg>
+      </div>
+    </div>
+
+    <!-- ITEMS LOADING -->
+    <div id="items-loading" class="linear-loader-container overflow-hidden top-0 left-0 right-0 position-fixed">
+      <div class="linear-loader overflow-hidden top-0 left-0 right-0 position-fixed"></div>
+    </div>
+
+    <!-- IFRAME -->
+    <div id="iframe-container" class="scrollable custom-scrollbar overflow-auto flex flex-column flex-align-start position-absolute absolute-all-size">
+      <!--NORMAL ITEM -->
+      <div id="iframe-item" class="flex-column w-100 flex-center"></div>
+
+      <!--IFRAME -->
+      <div id="iframe-iframe" class="w-100vw full-height border-none"></div>
+
+      <!-- GOTO TOP -->
+      <div class="goto-top cursor-pointer position-fixed flex flex-center">
+        <svg height="32" width="32" viewBox="0 0 48 48"><path d="M14.15 30.75 12 28.6l12-12 12 11.95-2.15 2.15L24 20.85Z" /></svg>
+      </div>
+
+      <!-- LOADING -->
+      <div id="iframe-loading" class="flex-column flex-center w-100">
+        <div class="circular-loader"></div>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <div id="menu-container" class="flex position-fixed bottom-0 left-0 right-0">
+      <!-- BACK -->
+      <div class="menu-button disable-iframe-open flex cursor-pointer button-back">
+        <svg viewBox="0 0 24 24"><path d="M17.77 3.77 16 2 6 12l10 10 1.77-1.77L9.54 12z"></path></svg>
+      </div>
+      <!-- NEXT -->
+      <div class="menu-button disable-iframe-open flex cursor-pointer button-more">
+        <svg viewBox="0 0 24 24"><path d="M6.23 20.23 8 22l10-10L8 2 6.23 3.77 14.46 12z"></path></svg>
+      </div>
+      <!-- CONFIG -->
+      <div class="menu-button disable-iframe-open flex cursor-pointer button-config">
+        <div class="position-relative wh-100 flex flex-center">
+          <div class="first-icon position-absolute top-0 left-0">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39c.51-.66.04-1.61-.79-1.61H5.04c-.83 0-1.3.95-.79 1.61z"
+              ></path>
+            </svg>
+          </div>
+          <div class="second-icon position-absolute bottom-0 right-0">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="m14.17 13.71 1.4-2.42c.09-.15.05-.34-.08-.45l-1.48-1.16c.03-.22.05-.45.05-.68s-.02-.46-.05-.69l1.48-1.16c.13-.11.17-.3.08-.45l-1.4-2.42c-.09-.15-.27-.21-.43-.15l-1.74.7c-.36-.28-.75-.51-1.18-.69l-.26-1.85c-.03-.16-.18-.29-.35-.29h-2.8c-.17 0-.32.13-.35.3L6.8 4.15c-.42.18-.82.41-1.18.69l-1.74-.7c-.16-.06-.34 0-.43.15l-1.4 2.42c-.09.15-.05.34.08.45l1.48 1.16c-.03.22-.05.45-.05.68s.02.46.05.69l-1.48 1.16c-.13.11-.17.3-.08.45l1.4 2.42c.09.15.27.21.43.15l1.74-.7c.36.28.75.51 1.18.69l.26 1.85c.03.16.18.29.35.29h2.8c.17 0 .32-.13.35-.3l.26-1.85c.42-.18.82-.41 1.18-.69l1.74.7c.16.06.34 0 .43-.15zM8.81 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm13.11 7.67-.96-.74c.02-.14.04-.29.04-.44 0-.15-.01-.3-.04-.44l.95-.74c.08-.07.11-.19.05-.29l-.9-1.55c-.05-.1-.17-.13-.28-.1l-1.11.45c-.23-.18-.48-.33-.76-.44l-.17-1.18c-.01-.12-.11-.2-.21-.2h-1.79c-.11 0-.21.08-.22.19l-.17 1.18c-.27.12-.53.26-.76.44l-1.11-.45c-.1-.04-.22 0-.28.1l-.9 1.55c-.05.1-.04.22.05.29l.95.74c-.02.14-.03.29-.03.44 0 .15.01.3.03.44l-.95.74c-.08.07-.11.19-.05.29l.9 1.55c.05.1.17.13.28.1l1.11-.45c.23.18.48.33.76.44l.17 1.18c.02.11.11.19.22.19h1.79c.11 0 .21-.08.22-.19l.17-1.18c.27-.12.53-.26.75-.44l1.12.45c.1.04.22 0 .28-.1l.9-1.55c.06-.09.03-.21-.05-.28zm-4.29.16c-.74 0-1.35-.6-1.35-1.35s.6-1.35 1.35-1.35 1.35.6 1.35 1.35-.61 1.35-1.35 1.35z"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <!-- SHARE -->
+      <div class="menu-button disable-no-iframe-open flex cursor-pointer button-share">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"
+          ></path>
+        </svg>
+      </div>
+      <!-- CLOSE -->
+      <div class="menu-button disable-no-iframe-open flex cursor-pointer button-close">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M14.59 8 12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+          ></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div id="config" class="position-absolute absolute-all-size overflow-hidden">
+      <div class="flex flex-column p-1 flex-justify-space-between wh-100 pb-2">
+        <div class="flex flex-column">
+          <!-- EMAIL -->
+          <div class="w-100 flex flex-row">
+            <div class="wh-24">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M21 8V7l-3 2-3-2v1l3 2 3-2zm1-5H2C.9 3 0 3.9 0 5v14c0 1.1.9 2 2 2h20c1.1 0 1.99-.9 1.99-2L24 5c0-1.1-.9-2-2-2zM8 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H2v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1zm8-6h-8V6h8v6z"
+                ></path>
+              </svg>
+            </div>
+            <div data-label="email" class="pl-1"></div>
+          </div>
+          <div id="config-email" class="mb-1 p-1">
+            <input id="config-email-input" placeholder="" data-placeholder="enterYourEmail" class="w-100 p-05 border-radius-4" maxlength="40" type="text" />
+          </div>
+          <!-- CATEGORIES -->
+          <div class="w-100 flex flex-row pb-05">
+            <div class="wh-24">
+              <svg viewBox="0 0 24 24">
+                <path d="m12 2-5.5 9h11z"></path>
+                <circle cx="17.5" cy="17.5" r="4.5"></circle>
+                <path d="M3 13.5h8v8H3z"></path>
+              </svg>
+            </div>
+            <div data-label="categories" class="pl-1"></div>
+          </div>
+          <div id="config-categories" class="mb-1 grid-2-columns flex-center"></div>
+        </div>
+        <div class="w-100 flex flex-center">
+          <button id="config-button-close" class="btn" data-label="close"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMAIL INPUT -->
+    <div id="input-email" class="input-form-container flex flex-column flex-center position-absolute absolute-all-size">
+      <div class="input-form flex flex-column w-100 p-1 shadow border-radius-4">
+        <div class="input-container flex flex-column flex-center mb-2">
+          <span class="input-label font-montserrat font-weight-600 w-100 pb-1" data-label="enterEmail"></span>
+          <input placeholder="" data-placeholder="enterYourEmail" class="w-100 p-05 border-radius-4" maxlength="40" type="text" />
+        </div>
+        <div class="buttons-container flex flex-row w-100 flex-justify-space-between">
+          <button id="input-email-btn-cancel" class="btn" data-label="cancel"></button>
+          <button id="input-email-btn-continue" class="btn" data-label="continue"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERAL LOADING -->
+    <div id="loading" class="circular-loader-container position-fixed absolute-all-size flex-column flex-center">
+      <div class="circular-loader"></div>
+    </div>
+
+    <!-- TEMPLATES [category-pill] -->
+    <template id="category-pill-template">
+      <div data-id="{{id}}" class="category-pill flex flex-row flex-align-center flex-align-start border-radius-4 p-025 shadow">
+        <div>
+          <input type="checkbox" />
+        </div>
+        <div class="category-name use-ellipsis no-wrap pl-1">{{category}}</div>
+      </div>
+    </template>
+    <!-- TEMPLATES [toast] -->
+    <template id="toast-template">
+      <div class="toast flex flex-row flex-justify-space-between position-fixed shadow">
+        <div class="toast-message flex flex-row flex-center font-montserrat p-025">{{message}}</div>
+        <div class="toast-close cursor-pointer flex flex-center">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M14.59 8 12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+            ></path>
+          </svg>
+        </div>
+      </div>
+    </template>
+    <!-- TEMPLATES [item] -->
+    <template id="item-template">
+      <div data-id="{{id}}" data-url="{{url}}" class="item flex flex-column cursor-pointer">
+        <!-- HEADER -->
+        <div class="flex flex-column flex-center item-header">
+          <!-- AUTHOR AND DATE (WHEN SMALL IMAGE) -->
+          <div class="flex flex-row flex-justify-space-between w-100 show-on-image-small">
+            <div class="author use-ellipsis no-wrap">{{author}}</div>
+            <div data-timestamp="{{timestamp}}" class="date use-ellipsis no-wrap text-right">{{date}}</div>
+          </div>
+          <!-- HEADER CONTENT -->
+          <div class="flex flex-column header-content">
+            <!-- IMAGE -->
+            <img class="item-image" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+            <!-- DATA -->
+            <div class="data flex flex-column flex-center w-100">
+              <!-- SOURCE NAME AND IMAGE (ON IFRAME VIEW) / AUTHOR AND DATE -->
+              <div class="flex flex-row flex-justify-space-between w-100">
+                <!-- SOURCE NAME AND IMAGE -->
+                <div class="source flex flex-row pt-025 flex-center">
+                  <img class="mr-25" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+                  <span class="source-name use-ellipsis hide no-wrap font-roboto">{{sourceName}}</span>
+                </div>
+                <!-- AUTHOR AND DATE (HIDE WHEN SMALL IMAGE) -->
+                <div class="flex flex-row flex-justify-space-between w-100 hide-on-image-small pt-025">
+                  <div class="author use-ellipsis no-wrap">{{author}}</div>
+                  <div data-timestamp="{{timestamp}}" class="date use-ellipsis no-wrap text-right">{{date}}</div>
+                </div>
+              </div>
+              <!-- TITLE -->
+              <div class="title use-ellipsis font-montserrat font-weight-600 pt-025 line-height-15 w-100">{{title}}</div>
+            </div>
+          </div>
+        </div>
+        <!-- BODY -->
+        <div class="item-body flex flex-column flex-center">
+          <div class="w-100 click-to-go link pt-05" data-label="clickToGo">{{clickToGo}}</div>
+          <!-- SUMMARY -->
+          <div class="summary use-ellipsis font-roboto text-justify pt-05">{{summary}}</div>
+        </div>
+        <!-- FOOTER -->
+        <div class="item-footer flex flex-row flex-justify-space-between pt-05 hide-on-iframe-mode">
+          <!-- SOURCE NAME AND IMAGE -->
+          <div class="source flex flex-row">
+            <img class="mr-25" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" />
+            <span class="source-name use-ellipsis no-wrap hide font-roboto">{{sourceName}}</span>
+          </div>
+          <!-- SHARE (ALL AND MAIL) -->
+          <div class="shares flex flex-row">
+            <div class="cursor-pointer share-all w-5 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 48 48">
+                <path
+                  d="M36.35 44q-2.35 0-4.025-1.675Q30.65 40.65 30.65 38.3q0-.35.075-.825t.225-.875L15.8 27.8q-.75.85-1.85 1.375t-2.25.525q-2.35 0-4.025-1.675Q6 26.35 6 24q0-2.4 1.675-4.05T11.7 18.3q1.15 0 2.2.45 1.05.45 1.9 1.3l15.15-8.7q-.15-.35-.225-.8-.075-.45-.075-.85 0-2.4 1.675-4.05T36.35 4q2.4 0 4.05 1.65t1.65 4.05q0 2.35-1.65 4.025-1.65 1.675-4.05 1.675-1.15 0-2.225-.375Q33.05 14.65 32.3 13.8l-15.15 8.4q.1.4.175.925.075.525.075.875t-.075.75q-.075.4-.175.8l15.15 8.6q.75-.7 1.75-1.125 1-.425 2.3-.425 2.4 0 4.05 1.65t1.65 4.05q0 2.35-1.65 4.025Q38.75 44 36.35 44Zm0-31.6q1.15 0 1.925-.775.775-.775.775-1.925t-.775-1.925Q37.5 7 36.35 7t-1.925.775q-.775.775-.775 1.925t.775 1.925q.775.775 1.925.775ZM11.7 26.7q1.15 0 1.925-.775.775-.775.775-1.925t-.775-1.925Q12.85 21.3 11.7 21.3t-1.925.775Q9 22.85 9 24t.775 1.925q.775.775 1.925.775ZM36.35 41q1.15 0 1.925-.775.775-.775.775-1.925t-.775-1.925Q37.5 35.6 36.35 35.6t-1.925.775q-.775.775-.775 1.925t.775 1.925Q35.2 41 36.35 41Zm0-31.3ZM11.7 24Zm24.65 14.3Z"
+                ></path>
+              </svg>
+            </div>
+            <div class="cursor-pointer share-email w-5 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 48 48">
+                <path
+                  d="M7 40q-1.2 0-2.1-.9Q4 38.2 4 37V11q0-1.2.9-2.1Q5.8 8 7 8h34q1.2 0 2.1.9.9.9.9 2.1v26q0 1.2-.9 2.1-.9.9-2.1.9Zm17-15.1L7 13.75V37h34V13.75Zm0-3L40.8 11H7.25ZM7 13.75V11v26Z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <!-- CATEGORY -->
+          <div class="category border-radius-4 text-center use-ellipsis no-wrap ml-1">{{category}}</div>
+        </div>
+      </div>
+    </template>
+
+    <script type="module">
+      import { init } from './app.js';
+      (() => init())();
+    </script>
+  </body>
+</html>
