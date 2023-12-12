@@ -38,7 +38,7 @@ const init = () => {
 // Error log
 const errorLog = (location, err) => {
   console.log(`${location} error:`, err);
-  showToast(`${getLabel('errorIn')} ${location}}`);
+  showToast(`${getLabel('errorIn')} ${location}`);
 };
 
 // Close config window
@@ -411,11 +411,20 @@ const dateText = (timestamp) => {
 // Image loaded correctly - Then check if it's small
 const imageCheck = (type, item, img) => {
   try {
+    let [ imageSmall, isVertical ] = [ false, false ];
     if (img.naturalWidth == 0 || img.naturalHeight == 0) imageError(type, item, img);
     else if (type === 'source-icon' && img.width <= 64) item.querySelectorAll('.list-item .source-name').forEach((el) => el.classList.remove('hide'));
-    else if (img.naturalWidth <= 400) item.classList.add('image-small');
-    else if (img.naturalHeight > img.naturalWidth) item.classList.add('image-vertical', 'image-small');
+    else if (img.naturalWidth <= 400) imageSmall = true;
+    else if (img.naturalHeight > img.naturalWidth) { imageSmall = true; isVertical = true; }
     else item.classList.remove('image-small');
+    if (imageSmall) {
+      // TODO: Calculate ratio
+      item.classList.add('image-small');
+      // Chequearl el width y height para saber si es vertical u horizontal
+      // const ratio = isVertical ? img.naturalHeight / img.naturalWidth : img.naturalWidth / img.naturalHeight;
+      if (isVertical)  item.classList.add('image-vertical');
+      // else item.style.maxWidth = `${ratio * 35}vw`;
+    }
   } catch (err) {
     errorLog('imageCheck', err);
   }
