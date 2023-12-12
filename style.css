@@ -321,6 +321,10 @@ body.no-items .list-no-items {
 .list-item.image-vertical .item-header .title {
   -webkit-line-clamp: calc(var(--title-lines) + 2) !important;
 }
+/* No Image */
+.list-item.no-image .item-header .header-content {
+  width: 100%;
+}
 /* image small */
 .list-item.image-small .item-header .data {
   align-self: self-start !important;
@@ -331,7 +335,7 @@ body.no-items .list-no-items {
 }
 .list-item.image-small .item-image {
   padding-top: 0.25rem;
-  max-width: 35%;
+  max-width: 35vw;
 }
 .list-item.image-small .item-header .title {
   text-align: start !important;
