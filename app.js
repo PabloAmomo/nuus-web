@@ -535,8 +535,9 @@ const gotoTop = (el) => {
   const scrollNow = () => {
     try {
       const scroll = el.scrollTop;
-      // Stop if scroll changed
-      if (Math.abs(lastScroll - scroll) > 10 || scroll <= 0) {
+      // Stop if scroll end
+      //if (Math.abs(lastScroll - scroll) > 10 || scroll <= 0) {
+      if (scroll <= 0) {
         el.classList.remove('scrolling');
         return;
       }
