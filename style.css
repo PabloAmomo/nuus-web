@@ -569,16 +569,19 @@ body.loading #loading {
   right: 1rem;
   transition: all 0.5s ease-in-out;
   padding-left: 1rem;
+  max-width: 90vw;
 }
 .toast .toast-message {
   color: var(--black);
 }
 .toast .toast-close {
-  fill: var(--black-light);
   color: var(--black-light);
   height: 2rem;
   width: 2rem;
   margin: 0.5rem 1rem 0.5rem 1rem;
+}
+.toast .toast-close svg {
+  fill: var(--black-light);
 }
 .toast.show {
   bottom: calc(var(--menu-height) + 6rem);

@@ -31,14 +31,13 @@ const init = () => {
     getData({ useCache: true });
   } catch (err) {
     errorLog('init', err);
-    showToast(`${getLabel('errorIn')} init`);
   }
 };
 
 // Error log
-const errorLog = (location, err) => {
+const errorLog = (location, err, label) => {
   console.log(`${location} error:`, err);
-  showToast(`${getLabel('errorIn')} ${location}`);
+  showToast(label ? getLabel(label) : `${getLabel('errorIn')} ${location}`);
 };
 
 // Close config window
@@ -357,17 +356,16 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
       data = { ...response };
       localStorage.setItem('last-data', JSON.stringify(data));
     })
-    .catch(() => {
+    .catch((err) => {
+      errorLog('procesing', {err}, 'errorRefreshing' );
       if (useCache) data = JSON.parse(localStorage.getItem('last-data') ?? null);
-      else showToast(getLabel('errorRefreshing'));
     })
     .finally(() => {
       try {
         if (backFrom) data.feeds.reverse();
         processItems(data);
       } catch (err) {
-        showToast(getLabel('errorProcessing'));
-        errorLog('procesing', err);
+        errorLog('procesing', err, 'errorProcessing' );
       }
       // Finish items loading
       document.body.classList.remove('items-loading');
