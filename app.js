@@ -43,8 +43,8 @@ const errorLog = (location, err, label) => {
 // Close config window
 const closeConfig = () => {
   try {
-    const oldFilter = localStorage.getItem('old-filter');
-    const newFilter = localStorage.getItem('filter');
+    const oldFilter = localStorage.getItem('old-filter') ?? '[]';
+    const newFilter = localStorage.getItem('filter') ?? '[]';
     if (oldFilter !== newFilter) {
       let data = localStorage.getItem('last-data');
       if (data) {
