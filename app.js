@@ -252,8 +252,7 @@ const respondWhenVisible = (element, callback) => {
 
 // Set item as readed
 const setReaded = (feedsId) => {
-  // TODO: Change API and call to POST
-  const callFecth = async () => await fetch(API_READED_URL.replace('{{user}}', currentUser()).replace('{{feedsId}}', feedsId), { method: 'GET' });
+  const callFecth = async () => await fetch(API_READED_URL.replace('{{user}}', currentUser()).replace('{{feedsId}}', feedsId), { method: 'POST' });
   callFecth();
 };
 
