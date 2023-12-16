@@ -1,6 +1,8 @@
 'use strict';
-const BASE_URL = 'https://feedapi.yatchapp.dev/api';
-let LAST_READED = null;
+const API_ACTIONS = ['/feeds', '/feeds/readed'];
+const BASE_URL = 'http://localhost:8080';
+// const API_ACTIONS = ['/setFeedItemReaded', '/getfeeditems'];
+// const BASE_URL = 'https://feedapi.yatchapp.dev/api';
 
 // Entry point for the application
 const init = () => {
@@ -118,6 +120,7 @@ const openConfig = () => {
 // Simple toast
 const showToast = (message) => {
   try {
+    document.body.querySelectorAll('.toast-close').forEach((el) => el.click());
     const toastContainer = document.createElement('div');
     toastContainer.innerHTML = document.getElementById('toast-template').innerHTML.replaceAll('{{message}}', message);
     const toast = toastContainer.firstElementChild;
@@ -252,7 +255,7 @@ const respondWhenVisible = (element, callback) => {
 
 // Set item as readed
 const setReaded = (feedsId) => {
-  const callFecth = async () => await fetch(API_READED_URL.replace('{{user}}', currentUser()).replace('{{feedsId}}', feedsId), { method: 'POST' });
+  const callFecth = async () => await fetch(API_READED_URL.replace('{{feedsId}}', feedsId), { method: 'POST', headers: { 'x-user': currentUser() } });
   callFecth();
 };
 
@@ -332,15 +335,15 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
 
   // Filters
   let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
-  if (filter.length > 0) filter = [...CATEGORIES.map((name, idx) => idx + 1).filter((id) => !filter.includes(id))];
+  // if (filter.length > 0) filter = [...CATEGORIES.map((name, idx) => idx + 1).filter((id) => !filter.includes(id))];
 
   // Call to API
   fetchWithTimeout(
-    API_ITEMS_URL.replace('{{user}}', currentUser())
+    API_ITEMS_URL
       .replace('{{count}}', 20)
       .replace('{{backFrom}}', backFrom)
       .replace('{{filter}}', filter.join(',')),
-    { method: 'GET' }
+    { method: 'GET', headers: { 'x-user': currentUser() } }
   )
     .then(async (response) => {
       // Get data from response
@@ -461,6 +464,7 @@ const addItem = (values) => {
     if (replace) replace.replaceWith(item);
     else if (iFrame) iFrame.appendChild(item);
     else ITEMS_CONTAINER.insertBefore(item, ITEMS_CONTAINER.firstElementChild || ITEMS_CONTAINER.querySelector('.list-finish'));
+    // TODO: Ver como ordenada la primera vez y la segunda... (Insert before, firstElemetChild haze que se ordene al reves)
     // Set read when item is visible
     respondWhenVisible(item, () => ((LAST_READED = id), setReaded(id)));
   } catch (err) {
@@ -558,8 +562,11 @@ const polyfill = () => {
 };
 
 // Constants
-const API_READED_URL = `${BASE_URL}/setFeedItemReaded?user={{user}}&feedsId={{feedsId}}`;
-const API_ITEMS_URL = `${BASE_URL}/getfeeditems?count={{count}}&user={{user}}&back={{backFrom}}&filter={{filter}}&feedsReaded={{feedReaded}}`;
+let LAST_READED = null;
+// const API_ITEMS_URL = `${BASE_URL}${API_ACTIONS[0]}?count={{count}}&user={{user}}&back={{backFrom}}&filter={{filter}}`;
+// const API_READED_URL = `${BASE_URL}${API_ACTIONS[1]}?user={{user}}&feedsId={{feedsId}}`;
+const API_ITEMS_URL = `${BASE_URL}${API_ACTIONS[0]}?count={{count}}&back={{backFrom}}&filter={{filter}}`;
+const API_READED_URL = `${BASE_URL}${API_ACTIONS[1]}?feedsId={{feedsId}}`;
 const [ITEM_TEMPLATE, ITEMS_CONTAINER] = ['item-template', 'list-items-container'].map((id) => document.getElementById(id));
 
 // Labels
