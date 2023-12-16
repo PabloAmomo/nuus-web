@@ -1,7 +1,5 @@
 'use strict';
-const API_ACTIONS = ['/feeds', '/feeds/readed'];
 const BASE_URL = 'http://localhost:8080';
-// const API_ACTIONS = ['/setFeedItemReaded', '/getfeeditems'];
 // const BASE_URL = 'https://feedapi.yatchapp.dev/api';
 
 // Entry point for the application
@@ -562,10 +560,8 @@ const polyfill = () => {
 
 // Constants
 let LAST_READED = null;
-// const API_ITEMS_URL = `${BASE_URL}${API_ACTIONS[0]}?count={{count}}&user={{user}}&back={{backFrom}}&filter={{filter}}`;
-// const API_READED_URL = `${BASE_URL}${API_ACTIONS[1]}?user={{user}}&feedsId={{feedsId}}`;
-const API_ITEMS_URL = `${BASE_URL}${API_ACTIONS[0]}?count={{count}}&back={{backFrom}}&filter={{filter}}`;
-const API_READED_URL = `${BASE_URL}${API_ACTIONS[1]}?feedsId={{feedsId}}`;
+const API_ITEMS_URL = `${BASE_URL}/feeds?count={{count}}&back={{backFrom}}&filter={{filter}}`;
+const API_READED_URL = `${BASE_URL}/feeds/readed?feedsId={{feedsId}}`;
 const [ITEM_TEMPLATE, ITEMS_CONTAINER] = ['item-template', 'list-items-container'].map((id) => document.getElementById(id));
 
 // Labels
