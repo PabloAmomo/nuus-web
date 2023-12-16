@@ -334,18 +334,12 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
   let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
   if (filter.length > 0) filter = [...CATEGORIES.map((name, idx) => idx + 1).filter((id) => !filter.includes(id))];
 
-  // Include currents items as readed in the query?
-  // let currentsItems = [];
-  // sendCurrentsAsReaded && ITEMS_CONTAINER.querySelectorAll('[data-id]').forEach((el) => currentsItems.push(el.getAttribute('data-id')));
-
   // Call to API
   fetchWithTimeout(
     API_ITEMS_URL.replace('{{user}}', currentUser())
       .replace('{{count}}', 20)
       .replace('{{backFrom}}', backFrom)
-      .replace('{{filter}}', filter.join(','))
-      // .replace('{{feedReaded}}', currentsItems.join(','))
-      ,
+      .replace('{{filter}}', filter.join(',')),
     { method: 'GET' }
   )
     .then(async (response) => {
