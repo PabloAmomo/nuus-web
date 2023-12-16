@@ -335,7 +335,6 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
 
   // Filters
   let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
-  // if (filter.length > 0) filter = [...CATEGORIES.map((name, idx) => idx + 1).filter((id) => !filter.includes(id))];
 
   // Call to API
   fetchWithTimeout(
