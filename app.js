@@ -365,7 +365,6 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
     })
     .finally(() => {
       try {
-        if (backFrom) data.feeds.reverse();
         processItems(data);
       } catch (err) {
         errorLog('procesing', err, 'errorProcessing');
