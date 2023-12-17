@@ -309,6 +309,7 @@ body:not(.items-loading) .list-finish .circular-loader {
   min-height: fit-content !important;
   margin-top: 5rem;
   margin-bottom: 6rem;
+  height: 6rem;
 }
 .list-no-items {
   display: none;
