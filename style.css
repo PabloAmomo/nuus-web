@@ -32,6 +32,10 @@
   /* BUTTON */
   --button-background-color: #2b5ac0;
   --button-color: var(--white);
+  /* BUTTON CLOSE */
+  --button-close-background-color: #2b5ac0;
+  --button-close-border-color: #2b5ac0;
+  --button-close-text-color: #fff;
   /* LIST ITEMS */
   --list-item-background-color: var(--white);
   --list-finish-background-color: var(--white);
@@ -149,6 +153,35 @@ body:not(.mobile) .goto-top {
 body.mobile .btn {
   font-size: 1rem;
   padding: 1rem 1.5rem 1rem 1.5rem;
+}
+.btn.btn-small {
+  font-size: .75rem!important;
+  padding: 0.75rem 1rem 0.75rem 1rem!important;
+  width: 6rem;
+}
+.btn.rounded-close {
+  border-radius: 50%;
+  color: transparent;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0!important;
+  border: 2px solid var(--button-close-border-color);
+  background-color: var(--button-close-background-color);
+  position: relative;
+}
+.btn.rounded-close::after {
+  content: 'X';
+  color: var(--button-close-text-color);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  box-sizing: content-box;
+  bottom: 0;
+  right: 0;
+  justify-content: center;
+  align-items: center;
 }
 
 /* --------------- */
@@ -714,6 +747,9 @@ body.show-config #config {
 .pl-05 {
   padding-left: 0.5rem;
 }
+.pr-05 {
+  padding-right: 0.5rem;
+}
 .pl-1 {
   padding-left: 1rem;
 }
@@ -746,6 +782,9 @@ body.show-config #config {
 .flex-justify-space-evenly {
   justify-content: space-evenly;
 }
+.flex-justify-space-around {
+  justify-content: space-around;
+}
 .flex-align-start {
   align-items: flex-start;
 }
@@ -761,6 +800,15 @@ body.show-config #config {
 }
 .top-0 {
   top: 0;
+}
+.top-05 {
+  top: 0.5rem;
+}
+.right-05 {
+  right: 0.5rem;
+}
+.right-1 {
+  right: 1rem;
 }
 .absolute-all-size {
   top: 0;
@@ -802,6 +850,9 @@ body.show-config #config {
 .m-05 {
   margin: 0.5rem;
 }
+.mt-1 {
+  margin-top: 1rem;
+}
 .ml-1 {
   margin-left: 1em;
 }
@@ -838,6 +889,9 @@ body.show-config #config {
 }
 .overflow-hidden {
   overflow: hidden !important;
+}
+.overflow-y-auto {
+  overflow-y: auto;
 }
 /* OTHERS */
 .shadow {

@@ -21,7 +21,7 @@
     <!-- WEB MANIFEST -->
     <link rel="manifest" href="webmanifest.json" />
   </head>
-  <body class="loading mobile">
+  <body class="loading mobile show-config">
     <!-- ITEMS -->
     <div
       id="list-items-container"
@@ -120,8 +120,8 @@
 
     <!-- CONFIG -->
     <div id="config" class="position-absolute absolute-all-size overflow-hidden">
-      <div class="flex flex-column p-1 flex-justify-space-between wh-100 pb-2">
-        <div class="flex flex-column">
+      <div class="flex flex-column p-1 flex-justify-space-between wh-100 pb-2 overflow-y-auto custom-scrollbar">
+        <div class="flex flex-column mt-1">
           <!-- EMAIL -->
           <div class="w-100 flex flex-row">
             <div class="wh-24">
@@ -147,10 +147,14 @@
             </div>
             <div data-label="categories" class="pl-1"></div>
           </div>
-          <div id="config-categories" class="mb-1 grid-2-columns flex-center"></div>
+          <div id="config-categories" class="mb-1 grid-2-columns flex-center pl-05 pr-05"></div>
+          <div id="config-categories-buttons" class="mb-1 flex flex-center flex-row flex-justify-space-around">
+            <button id="config-categories-button-select-all" class="btn btn-small" data-label="selectAll"></button>
+            <button id="config-categories-button-deselect-all" class="btn btn-small" data-label="deselectAll"></button>
+          </div>
         </div>
-        <div class="w-100 flex flex-center">
-          <button id="config-button-close" class="btn" data-label="close"></button>
+        <div class="position-absolute flex flex-center top-05 right-1">
+          <button id="config-button-close" class="btn rounded-close" data-label="close"></button>
         </div>
       </div>
     </div>

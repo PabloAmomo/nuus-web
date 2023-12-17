@@ -28,6 +28,14 @@ const init = () => {
     // Config Form: Add close config event and email change event
     document.getElementById('config-button-close').addEventListener('click', () => closeConfig());
     document.getElementById('config-email-input').addEventListener('change', (event) => localStorage.setItem('email', event.target.value));
+    // Config - Select All - Deselect All
+    const allToState = (el, state) => ((el.checked = state), inputCategoryChange(el));
+    document
+      .getElementById('config-categories-button-select-all')
+      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el) => allToState(el, true)));
+    document
+      .getElementById('config-categories-button-deselect-all')
+      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el, idx) => (idx>0) && allToState(el, false)));
     // Load items
     getData({ useCache: true });
   } catch (err) {
@@ -68,6 +76,25 @@ const closeConfig = () => {
   }
 };
 
+// Add or remove categories
+const inputCategoryChange = (el) => {
+  try {
+    const {
+      checked,
+      dataset: { id },
+    } = el;
+    // Read categories and remove or add category, then save in local storage
+    let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
+    if (checked) filter.splice(filter.indexOf(parseInt(id)), 1);
+    else filter.push(parseInt(id));
+    filter.sort((a, b) => a - b);
+    localStorage.setItem('filter', JSON.stringify(filter));
+    console.log('filter', filter);
+  } catch (err) {
+    errorLog('inputChange', err);
+  }
+};
+
 // Open config window
 const openConfig = () => {
   localStorage.setItem('old-filter', localStorage.getItem('filter') ?? '[]');
@@ -76,23 +103,6 @@ const openConfig = () => {
   // Clean categories and set the email
   categories.innerHTML = '';
   mailInput.value = localStorage.getItem('email') ?? '';
-  // Add or remove categories
-  const inputChange = (el) => {
-    try {
-      const {
-        checked,
-        dataset: { id },
-      } = el;
-      // Read categories and remove or add category, then save in local storage
-      let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
-      if (checked) filter.splice(filter.indexOf(parseInt(id)), 1);
-      else filter.push(parseInt(id));
-      filter.sort((a, b) => a - b);
-      localStorage.setItem('filter', JSON.stringify(filter));
-    } catch (err) {
-      errorLog('inputChange', err);
-    }
-  };
   // Add categories
   try {
     let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
@@ -105,8 +115,8 @@ const openConfig = () => {
       const input = pill.querySelector('input');
       input.checked = !filter.includes(i + 1);
       input.dataset.id = i + 1;
-      pill.addEventListener('click', () => ((input.checked = !pill.querySelector('input').checked), inputChange(input)));
-      input.addEventListener('click', (event) => (event.stopPropagation(), inputChange(input)));
+      pill.addEventListener('click', () => ((input.checked = !pill.querySelector('input').checked), inputCategoryChange(input)));
+      input.addEventListener('click', (event) => (event.stopPropagation(), inputCategoryChange(input)));
       categories.appendChild(pill);
     }
     document.body.classList.add('show-config');
@@ -459,11 +469,7 @@ const addItem = (values) => {
     // Add item to list
     if (replace) replace.replaceWith(item);
     else if (iFrame) iFrame.appendChild(item);
-    else {
-      // TODO: Ver como ordenada la primera vez y la segunda... (Insert before, firstElemetChild haze que se ordene al reves)
-      // Una solcuion seria marcar desde que item hay que agregar, y ir meitendo before a ese item...
-      ITEMS_CONTAINER.insertBefore(item, ITEMS_CONTAINER.firstElementChild || ITEMS_CONTAINER.querySelector('.list-finish'));
-    }
+    else ITEMS_CONTAINER.insertBefore(item, ITEMS_CONTAINER.querySelector('.list-finish'));
     // Set read when item is visible
     respondWhenVisible(item, 'processing-items', () => ((LAST_READED = id), setReaded(id)));
   } catch (err) {
@@ -608,6 +614,8 @@ const LABELS = {
   email: 'Email',
   categories: 'Categorías',
   errorIn: 'Error en',
+  selectAll: 'todos',
+  deselectAll: 'ninguno',
 };
 
 // Categories
