@@ -14,7 +14,7 @@ Welcome to Nuus, a 'Code for Fun' project! This lightweight, efficient news feed
 - **Clone or Download**: Start by cloning this repository or downloading it as a ZIP file.
 
 ```
-git clone https://github.com/PabloAmomo/nuus
+git clone https://github.com/PabloAmomo/nuus-web
 ```
 Or download the ZIP file and extract it.
 
