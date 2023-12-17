@@ -27,14 +27,8 @@ const init = () => {
     // Config Form: Add close config event and email change event
     document.getElementById('config-button-close').addEventListener('click', () => closeConfig());
     document.getElementById('config-email-input').addEventListener('change', (event) => localStorage.setItem('email', event.target.value));
-    // Config - Select All - Deselect All
-    const allToState = (el, state) => ((el.checked = state), inputCategoryChange(el));
-    document
-      .getElementById('config-categories-button-select-all')
-      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el) => allToState(el, true)));
-    document
-      .getElementById('config-categories-button-deselect-all')
-      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el, idx) => (idx>0) && allToState(el, false)));
+    // Create Categories
+    createCategories();
     // Load items
     getData({ useCache: true });
   } catch (err) {
@@ -54,6 +48,7 @@ const closeConfig = () => {
     const oldFilter = localStorage.getItem('old-filter') ?? '[]';
     const newFilter = localStorage.getItem('filter') ?? '[]';
     if (oldFilter !== newFilter) {
+      // Filter current data for user categories selection
       let data = localStorage.getItem('last-data');
       if (data) {
         data = JSON.parse(data);
@@ -78,10 +73,8 @@ const closeConfig = () => {
 // Add or remove categories
 const inputCategoryChange = (el) => {
   try {
-    const {
-      checked,
-      dataset: { id },
-    } = el;
+    const { checked } = el;
+    const id = el.dataset.id;
     // Read categories and remove or add category, then save in local storage
     let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
     if (checked) filter.splice(filter.indexOf(parseInt(id)), 1);
@@ -94,33 +87,53 @@ const inputCategoryChange = (el) => {
   }
 };
 
-// Open config window
-const openConfig = () => {
-  localStorage.setItem('old-filter', localStorage.getItem('filter') ?? '[]');
-  const [mailInput, categories, categoryPill] = ['config-email-input', 'config-categories', 'category-pill-template'].map((id) => document.getElementById(id));
-  if (!categories || !categoryPill || !mailInput) return errorLog('openConfig', { error: 'elements not found' });
-  // Clean categories and set the email
-  categories.innerHTML = '';
-  mailInput.value = localStorage.getItem('email') ?? '';
-  // Add categories
+/* Create categories in config form */
+const createCategories = () => {
+  const [categories, categoryPill] = ['config-categories', 'category-pill-template'].map((id) => document.getElementById(id));
   try {
-    let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
+    // Config - Select All - Deselect All
+    const allToState = (el, state) => ((el.checked = state), inputCategoryChange(el));
+    document
+      .getElementById('config-categories-button-select-all')
+      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el) => allToState(el, true)));
+    document
+      .getElementById('config-categories-button-deselect-all')
+      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el, idx) => idx > 0 && allToState(el, false)));
+    // List of categories
+    let pill, newPill, input;
     for (let i = 1; i < CATEGORIES.length; i++) {
-      const newPill = document.createElement('div');
+      newPill = document.createElement('div');
       newPill.innerHTML = categoryPill.innerHTML.replace('{{category}}', getLabel(CATEGORIES[i]));
-      const pill = newPill.firstElementChild;
+      pill = newPill.firstElementChild;
       pill.style.backgroundColor = `var(--color-${i})`;
       pill.dataset.id = i;
-      const input = pill.querySelector('input');
-      input.checked = !filter.includes(i);
+      input = pill.querySelector('input');
       input.dataset.id = i;
       pill.addEventListener('click', () => ((input.checked = !pill.querySelector('input').checked), inputCategoryChange(input)));
       input.addEventListener('click', (event) => (event.stopPropagation(), inputCategoryChange(input)));
       categories.appendChild(pill);
     }
-    document.body.classList.add('show-config');
   } catch (err) {
     categories.innerHTML = '';
+    errorLog('createCategories', err);
+  }
+};
+
+// Open config window
+const openConfig = () => {
+  try {
+    localStorage.setItem('old-filter', localStorage.getItem('filter') ?? '[]');
+    // Set email
+    document.getElementById('config-email-input').value = localStorage.getItem('email') ?? '';
+    // Set categories
+    let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
+    document.querySelectorAll('.category-pill input[data-id]').forEach((el) => {
+      const { id } = el.dataset;
+      el.checked = !filter.includes(parseInt(id));
+    });
+    // Show config
+    document.body.classList.add('show-config');
+  } catch (err) {
     errorLog('openConfig', err);
   }
 };
@@ -316,7 +329,7 @@ const getItemData = (item, sources) => {
     const timestamp = new Date(new Date(publish).getTime() + new Date().getTimezoneOffset() * -1 * 60000).getTime();
     const summary = (content ?? '').trim() != '' ? content : item.summary;
     const image = getFirstImage(item.images);
-    const sourceTypeLabel = getLabel(CATEGORIES[sourceType] ?? `TYPE-${sourceType}`) ;
+    const sourceTypeLabel = getLabel(CATEGORIES[sourceType] ?? `TYPE-${sourceType}`);
     const date = dateText(timestamp);
     return { id, url, author, title, summary, sourceName, sourceIcon, timestamp, date, sourceType, sourceTypeLabel, image }; //
   } catch (err) {
@@ -468,7 +481,7 @@ const addItem = (values) => {
     else if (iFrame) iFrame.appendChild(item);
     else ITEMS_CONTAINER.insertBefore(item, ITEMS_CONTAINER.querySelector('.list-finish'));
     // Set read when item is visible
-    respondWhenVisible(item, 'processing-items', () => ((LAST_READED = id), setReaded(id)));
+    respondWhenVisible(item, 'processing-items', () => setReaded(id));
   } catch (err) {
     errorLog('addItem', err);
   }
@@ -515,7 +528,7 @@ const processItems = (data) => {
     const readedToSend = [];
     items?.slice(0, 3)?.forEach((item) => readedToSend.push(item.id));
     if (readedToSend.length > 0) {
-      LAST_READED = readedToSend[readedToSend.length - 1];
+      LAST_READED = readedToSend[0];
       setReaded(readedToSend.join(','));
     }
   } catch (err) {

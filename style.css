@@ -665,6 +665,9 @@ body.show-input-email #input-email {
 body.show-config #config {
   height: 100%;
 }
+body.show-config #config .config-container {
+  overflow-y: auto;
+}
 #config-email-input {
   border: 1px solid var(--gray-light);
 }
