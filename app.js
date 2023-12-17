@@ -60,7 +60,7 @@ const closeConfig = () => {
         data.feeds = data.feeds.filter((item) => {
           const { sourceId } = item;
           const source = data.sources.find((source) => source.id === sourceId);
-          return !newFilter.includes(CATEGORIES.indexOf(source.type) + 1);
+          return !newFilter.includes(source.type);
         });
         // Use data to update items
         processItems(data);
@@ -105,15 +105,15 @@ const openConfig = () => {
   // Add categories
   try {
     let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
-    for (let i = 0; i < CATEGORIES.length; i++) {
+    for (let i = 1; i < CATEGORIES.length; i++) {
       const newPill = document.createElement('div');
       newPill.innerHTML = categoryPill.innerHTML.replace('{{category}}', getLabel(CATEGORIES[i]));
       const pill = newPill.firstElementChild;
-      pill.style.backgroundColor = `var(--color-${i + 1})`;
-      pill.dataset.id = i + 1;
+      pill.style.backgroundColor = `var(--color-${i})`;
+      pill.dataset.id = i;
       const input = pill.querySelector('input');
-      input.checked = !filter.includes(i + 1);
-      input.dataset.id = i + 1;
+      input.checked = !filter.includes(i);
+      input.dataset.id = i;
       pill.addEventListener('click', () => ((input.checked = !pill.querySelector('input').checked), inputCategoryChange(input)));
       input.addEventListener('click', (event) => (event.stopPropagation(), inputCategoryChange(input)));
       categories.appendChild(pill);
@@ -311,15 +311,14 @@ const currentEmail = (callback) => {
 const getItemData = (item, sources) => {
   try {
     const { id, link: url, title, content, publish } = item;
-    const { name: sourceName, icon: sourceIcon, type: category } = sources.find((source) => source.id === item.sourceId);
+    const { name: sourceName, icon: sourceIcon, type: sourceType } = sources.find((source) => source.id === item.sourceId);
     const author = item?.authors?.[0] ?? item?.author ?? '';
     const timestamp = new Date(new Date(publish).getTime() + new Date().getTimezoneOffset() * -1 * 60000).getTime();
     const summary = (content ?? '').trim() != '' ? content : item.summary;
-    const categoryId = CATEGORIES.indexOf(category ?? 0) + 1;
     const image = getFirstImage(item.images);
-    const categoryName = getLabel(category) ?? category;
+    const sourceTypeLabel = getLabel(CATEGORIES[sourceType] ?? `TYPE-${sourceType}`) ;
     const date = dateText(timestamp);
-    return { id, url, author, title, summary, sourceName, sourceIcon, timestamp, date, categoryId, category: categoryName, image };
+    return { id, url, author, title, summary, sourceName, sourceIcon, timestamp, date, sourceType, sourceTypeLabel, image }; //
   } catch (err) {
     errorLog('getItemData', err);
     return null;
@@ -429,7 +428,7 @@ const getLabel = (label) => LABELS[label] ?? `*${label}*`;
 const addItem = (values) => {
   if (values.id == null) return errorLog('addItem', { error: 'id is null' }, values);
   try {
-    let { id, url, title, summary, image, sourceIcon, categoryId, iFrame, replace } = values;
+    let { id, url, title, summary, image, sourceIcon, sourceType, iFrame, replace } = values;
     // Replace values in template
     let html = ITEM_TEMPLATE.innerHTML;
     for (let key in values) html = html.replaceAll(`{{${key}}}`, values[key]);
@@ -440,7 +439,7 @@ const addItem = (values) => {
     if (iFrame) item.classList.add('iframe-mode');
     item.classList.add('list-item');
     item.innerHTML = html;
-    item.querySelectorAll('.item-footer .category').forEach((el) => (el.style.backgroundColor = `var(--color-${categoryId})`));
+    item.querySelectorAll('.item-footer .category').forEach((el) => (el.style.backgroundColor = `var(--color-${sourceType})`));
     // Add image events, and then, load image
     ['.item-image', '.source img'].forEach((selector, idx) => {
       item.querySelectorAll(selector).forEach((el) => {
@@ -618,6 +617,7 @@ const LABELS = {
 
 // Categories
 const CATEGORIES = [
+  '',
   'general',
   'criminal',
   'international',
