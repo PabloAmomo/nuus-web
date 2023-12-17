@@ -300,6 +300,7 @@ body.no-items .list-finish {
 body.items-loading .list-finish .button-more {
   display: none!important;
 }
+body.loading .list-finish .circular-loader,
 body:not(.items-loading) .list-finish .circular-loader {
   display: none;
 } 
