@@ -1,6 +1,14 @@
 'use strict';
-const BASE_URL = 'http://localhost:8080';
-// const BASE_URL = 'https://feedapi.yatchapp.dev/api';
+// const BASE_URL = 'http://localhost:8080';
+// const APIS_FUNCTIONS = ['feeds', 'feeds/readed'];
+
+// const BASE_URL = 'https://feedapi.yatchapp.dev';
+// const APIS_FUNCTIONS = ['feeds', 'feeds/readed'];
+
+const BASE_URL = 'https://feedapi.yatchapp.dev/api';
+const APIS_FUNCTIONS = ['setFeedItemReaded', 'getfeeditems'];
+
+
 
 // Entry point for the application
 const init = () => {
@@ -236,12 +244,13 @@ const menuButton = (action) => {
 };
 
 // Make element response when visible
-const respondWhenVisible = (element, callback) => {
+const respondWhenVisible = (element, ignoreIfClass, callback) => {
   const options = { root: document.body };
   // Create observer to check item visibility
   const observer = new IntersectionObserver((entries, observer) => {
     entries.forEach((entry) => {
       if (entry.intersectionRatio > 0) {
+        if (ignoreIfClass && document.body.classList.contains(ignoreIfClass)) return;
         observer.disconnect();
         callback();
       }
@@ -253,7 +262,8 @@ const respondWhenVisible = (element, callback) => {
 
 // Set item as readed
 const setReaded = (feedsId) => {
-  const callFecth = async () => await fetch(API_READED_URL.replace('{{feedsId}}', feedsId), { method: 'POST', headers: { 'x-user': currentUser() } });
+  // TODO: remove {{user}} when use new API
+  const callFecth = async () => await fetch(API_READED_URL.replace('{{user}}', currentUser()).replace('{{feedsId}}', feedsId), { method: 'POST', headers: { 'x-user': currentUser() } });
   callFecth();
 };
 
@@ -333,10 +343,13 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
 
   // Filters
   let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
+  // TODO: remove when use new API
+  if (filter.length > 0) filter = [...CATEGORIES.map((name, idx) => idx + 1).filter((id) => !filter.includes(id))]; 
 
   // Call to API
   fetchWithTimeout(
     API_ITEMS_URL
+      .replace('{{user}}', currentUser()) // TODO: remove when use new API
       .replace('{{count}}', 20)
       .replace('{{backFrom}}', backFrom)
       .replace('{{filter}}', filter.join(',')),
@@ -463,7 +476,10 @@ const addItem = (values) => {
     else ITEMS_CONTAINER.insertBefore(item, ITEMS_CONTAINER.firstElementChild || ITEMS_CONTAINER.querySelector('.list-finish'));
     // TODO: Ver como ordenada la primera vez y la segunda... (Insert before, firstElemetChild haze que se ordene al reves)
     // Set read when item is visible
-    respondWhenVisible(item, () => ((LAST_READED = id), setReaded(id)));
+    respondWhenVisible(item, 'processing-items', () => {
+      LAST_READED = id; 
+      setReaded(id);
+    });
   } catch (err) {
     errorLog('addItem', err);
   }
@@ -496,7 +512,7 @@ const processItems = (data) => {
   try {
     const { sources, feeds: items } = data ?? { sources: [], feeds: [] };
     // Start scroll to top animation
-    gotoTop(ITEMS_CONTAINER);
+    gotoTop(ITEMS_CONTAINER, 'processing-items');
     // Mark items to be remove
     [...document.querySelectorAll('.list-item')].forEach((item) => item.classList.add('to-remove'));
     const itemsToRemove = [...document.querySelectorAll('.list-item.to-remove')];
@@ -519,8 +535,10 @@ const processItems = (data) => {
 };
 
 // Scroll to top (Smooth)
-const gotoTop = (el) => {
+const gotoTop = (el, addClass) => {
   if (el.classList.contains('scrolling') || el.scrollTop == 0) return;
+  // Add class to Body
+  if (addClass) document.body.classList.add(addClass);
   // Mark as scrolling
   el.classList.add('scrolling');
   // Scroll to top (Variable speed - Desaccelerating)
@@ -531,8 +549,8 @@ const gotoTop = (el) => {
     try {
       const scroll = el.scrollTop;
       // Stop if scroll end
-      //if (Math.abs(lastScroll - scroll) > 10 || scroll <= 0) {
       if (scroll <= 0) {
+        if (addClass) document.body.classList.remove(addClass);
         el.classList.remove('scrolling');
         return;
       }
@@ -540,6 +558,7 @@ const gotoTop = (el) => {
       lastScroll = el.scrollTop;
       requestAnimationFrame(scrollNow);
     } catch (err) {
+      if (addClass) document.body.classList.remove(addClass);
       el.scrollTop = 0;
       errorLog('gotoTop', err);
     }
@@ -560,8 +579,13 @@ const polyfill = () => {
 
 // Constants
 let LAST_READED = null;
-const API_ITEMS_URL = `${BASE_URL}/feeds?count={{count}}&back={{backFrom}}&filter={{filter}}`;
-const API_READED_URL = `${BASE_URL}/feeds/readed?feedsId={{feedsId}}`;
+// TODO: Configure new API
+// const API_ITEMS_URL = `${BASE_URL}/${APIS_FUNCTIONS[0]}?count={{count}}&back={{backFrom}}&filter={{filter}}`;
+// const API_READED_URL = `${BASE_URL}/${APIS_FUNCTIONS[1]}?feedsId={{feedsId}}`;
+const API_READED_URL = `${BASE_URL}/${APIS_FUNCTIONS[0]}?user={{user}}&feedsId={{feedsId}}`;
+const API_ITEMS_URL = `${BASE_URL}/${APIS_FUNCTIONS[1]}?count={{count}}&user={{user}}&back={{backFrom}}&filter={{filter}}&feedsReaded={{feedReaded}}`;
+
+
 const [ITEM_TEMPLATE, ITEMS_CONTAINER] = ['item-template', 'list-items-container'].map((id) => document.getElementById(id));
 
 // Labels
