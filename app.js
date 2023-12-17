@@ -2,13 +2,11 @@
 // const BASE_URL = 'http://localhost:8080';
 // const APIS_FUNCTIONS = ['feeds', 'feeds/readed'];
 
-// const BASE_URL = 'https://feedapi.yatchapp.dev';
-// const APIS_FUNCTIONS = ['feeds', 'feeds/readed'];
+const BASE_URL = 'https://feedapi.yatchapp.dev';
+const APIS_FUNCTIONS = ['feeds', 'feeds/readed'];
 
-const BASE_URL = 'https://feedapi.yatchapp.dev/api';
-const APIS_FUNCTIONS = ['setFeedItemReaded', 'getfeeditems'];
-
-
+// const BASE_URL = 'https://feedapi.yatchapp.dev/api';
+// const APIS_FUNCTIONS = ['setFeedItemReaded', 'getfeeditems'];
 
 // Entry point for the application
 const init = () => {
@@ -263,8 +261,18 @@ const respondWhenVisible = (element, ignoreIfClass, callback) => {
 // Set item as readed
 const setReaded = (feedsId) => {
   // TODO: remove {{user}} when use new API
-  const callFecth = async () => await fetch(API_READED_URL.replace('{{user}}', currentUser()).replace('{{feedsId}}', feedsId), { method: 'POST', headers: { 'x-user': currentUser() } });
-  callFecth();
+  fetchWithTimeout(
+    API_READED_URL
+      //.replace('{{user}}', currentUser()) // TODO: remove when use new API
+      .replace('{{feedsId}}', feedsId),
+    { method: 'POST', headers: { 'x-user': currentUser() } }
+  ).catch((err) => {
+    console.log('error marked readed item(s)', feedsId, err);
+  });
+  // TODO: Remove !!!
+  // const callFecth = async () =>
+  //   await fetch(API_READED_URL.replace('{{user}}', currentUser()).replace('{{feedsId}}', feedsId), { method: 'POST', headers: { 'x-user': currentUser() } });
+  // callFecth();
 };
 
 // Get current user (Or set if not exists)
@@ -344,12 +352,12 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
   // Filters
   let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
   // TODO: remove when use new API
-  if (filter.length > 0) filter = [...CATEGORIES.map((name, idx) => idx + 1).filter((id) => !filter.includes(id))]; 
+  // if (filter.length > 0) filter = [...CATEGORIES.map((name, idx) => idx + 1).filter((id) => !filter.includes(id))];
 
   // Call to API
   fetchWithTimeout(
     API_ITEMS_URL
-      .replace('{{user}}', currentUser()) // TODO: remove when use new API
+      //.replace('{{user}}', currentUser()) // TODO: remove when use new API
       .replace('{{count}}', 20)
       .replace('{{backFrom}}', backFrom)
       .replace('{{filter}}', filter.join(',')),
@@ -364,7 +372,7 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
       localStorage.setItem('last-data', JSON.stringify(data));
     })
     .catch((err) => {
-      errorLog('procesing', {err}, 'errorRefreshing' );
+      errorLog('procesing', { err }, 'errorRefreshing');
       if (useCache) data = JSON.parse(localStorage.getItem('last-data') ?? null);
     })
     .finally(() => {
@@ -372,7 +380,7 @@ const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false
         if (backFrom) data.feeds.reverse();
         processItems(data);
       } catch (err) {
-        errorLog('procesing', err, 'errorProcessing' );
+        errorLog('procesing', err, 'errorProcessing');
       }
       // Finish items loading
       document.body.classList.remove('items-loading');
@@ -477,7 +485,7 @@ const addItem = (values) => {
     // TODO: Ver como ordenada la primera vez y la segunda... (Insert before, firstElemetChild haze que se ordene al reves)
     // Set read when item is visible
     respondWhenVisible(item, 'processing-items', () => {
-      LAST_READED = id; 
+      LAST_READED = id;
       setReaded(id);
     });
   } catch (err) {
@@ -580,11 +588,10 @@ const polyfill = () => {
 // Constants
 let LAST_READED = null;
 // TODO: Configure new API
-// const API_ITEMS_URL = `${BASE_URL}/${APIS_FUNCTIONS[0]}?count={{count}}&back={{backFrom}}&filter={{filter}}`;
-// const API_READED_URL = `${BASE_URL}/${APIS_FUNCTIONS[1]}?feedsId={{feedsId}}`;
-const API_READED_URL = `${BASE_URL}/${APIS_FUNCTIONS[0]}?user={{user}}&feedsId={{feedsId}}`;
-const API_ITEMS_URL = `${BASE_URL}/${APIS_FUNCTIONS[1]}?count={{count}}&user={{user}}&back={{backFrom}}&filter={{filter}}&feedsReaded={{feedReaded}}`;
-
+const API_ITEMS_URL = `${BASE_URL}/${APIS_FUNCTIONS[0]}?count={{count}}&back={{backFrom}}&filter={{filter}}`;
+const API_READED_URL = `${BASE_URL}/${APIS_FUNCTIONS[1]}?feedsId={{feedsId}}`;
+// const API_ITEMS_URL = `${BASE_URL}/${APIS_FUNCTIONS[0]}?count={{count}}&user={{user}}&back={{backFrom}}&filter={{filter}}&feedsReaded={{feedReaded}}`;
+// const API_READED_URL = `${BASE_URL}/${APIS_FUNCTIONS[1]}?user={{user}}&feedsId={{feedsId}}`;
 
 const [ITEM_TEMPLATE, ITEMS_CONTAINER] = ['item-template', 'list-items-container'].map((id) => document.getElementById(id));
 
