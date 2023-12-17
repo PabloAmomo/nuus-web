@@ -614,8 +614,8 @@ const LABELS = {
   email: 'Email',
   categories: 'Categorías',
   errorIn: 'Error en',
-  selectAll: 'todos',
-  deselectAll: 'ninguno',
+  selectAll: 'todas',
+  deselectAll: 'ninguna',
 };
 
 // Categories
