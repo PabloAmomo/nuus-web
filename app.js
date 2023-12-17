@@ -252,7 +252,7 @@ const menuButton = (action) => {
   const iframeVisible = document.body.classList.contains('iframe-open');
   const configVisible = document.body.classList.contains('show-config');
   if (action === 'back' && !iframeVisible && !configVisible) getData({ backFrom: LAST_READED });
-  else if (action === 'more' && !iframeVisible && !configVisible) getData({ sendCurrentsAsReaded: true });
+  else if (action === 'more' && !iframeVisible && !configVisible) getData({});
   else if (action === 'config' && !iframeVisible && !configVisible) openConfig();
   else if (action === 'share') shareIframe();
   else if (action === 'close') closeIframe();
@@ -348,7 +348,7 @@ const getFirstImage = (images) => {
 };
 
 // Get data from API
-const getData = ({ backFrom = '', sendCurrentsAsReaded = false, useCache = false }) => {
+const getData = ({ backFrom = '', useCache = false }) => {
   // start load items
   document.body.classList.add('items-loading');
 
@@ -448,7 +448,10 @@ const addItem = (values) => {
     html = html.replaceAll('{{clickToGo}}', getLabel('clickToGo'));
     // Create new list item
     const item = document.createElement('div');
-    item.addEventListener('click', () => (iFrame ? openWeb(values) : openOnIframe({ ...values, replace: null, iFrame: null })));
+    item.addEventListener('click', () => {
+      if (document.body.classList.contains('items-loading')) return;
+      (iFrame ? openWeb(values) : openOnIframe({ ...values, replace: null, iFrame: null }))
+    });
     if (iFrame) item.classList.add('iframe-mode');
     item.classList.add('list-item');
     item.innerHTML = html;
@@ -472,6 +475,7 @@ const addItem = (values) => {
     // Share buttons events
     ['all', 'email'].forEach((type) => {
       item.querySelector(`.share-${type}`).addEventListener('click', (evt) => {
+        if (document.body.classList.contains('items-loading')) return;
         evt.stopPropagation();
         share({ id, type, url, title, summary });
       });
