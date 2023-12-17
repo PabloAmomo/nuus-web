@@ -312,6 +312,9 @@ body.no-items .list-no-items {
   margin: 0.5rem 0.5rem 0 0.5rem;
   border-bottom: 1px solid var(--item-bottom-border-color);
 }
+.list-item .item-header .header-content {
+  width: 100%;
+}
 /* image vertical */
 .list-item.image-vertical .item-image {
   max-height: 120px;
@@ -327,12 +330,16 @@ body.no-items .list-no-items {
   width: 100%;
 }
 /* image small */
+.list-item.image-small .item-header {
+  width: 100%;
+}
 .list-item.image-small .item-header .data {
   align-self: self-start !important;
 }
 .list-item.image-small .item-header .header-content {
   flex-direction: row-reverse !important;
   column-gap: 0.75rem !important;
+  width: 100%;
 }
 .list-item.image-small .item-image {
   padding-top: 0.25rem;
