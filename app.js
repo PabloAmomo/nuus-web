@@ -1,7 +1,6 @@
 'use strict';
 // const BASE_URL = 'http://localhost:8080';
 const BASE_URL = 'https://feedapi.yatchapp.dev';
-const APIS_FUNCTIONS = ['feeds', 'feeds/readed'];
 
 // Entry point for the application
 const init = () => {
@@ -570,8 +569,8 @@ const polyfill = () => {
 
 // Constants
 let LAST_READED = null;
-const API_ITEMS_URL = `${BASE_URL}/${APIS_FUNCTIONS[0]}?count={{count}}&back={{backFrom}}&filter={{filter}}`;
-const API_READED_URL = `${BASE_URL}/${APIS_FUNCTIONS[1]}?feedsId={{feedsId}}`;
+const API_ITEMS_URL = `${BASE_URL}/feeds?count={{count}}&back={{backFrom}}&filter={{filter}}`;
+const API_READED_URL = `${BASE_URL}/feeds/readed?feedsId={{feedsId}}`;
 const [ITEM_TEMPLATE, ITEMS_CONTAINER] = ['item-template', 'list-items-container'].map((id) => document.getElementById(id));
 
 // Labels
