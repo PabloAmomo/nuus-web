@@ -297,9 +297,12 @@ body.loading .list-items-container {
 body.no-items .list-finish {
   display: none !important;
 }
-body.items-loading .list-finish {
-  visibility: hidden !important;
+body.items-loading .list-finish .button-more {
+  display: none!important;
 }
+body:not(.items-loading) .list-finish .circular-loader {
+  display: none;
+} 
 .list-finish {
   background-color: var(--list-finish-background-color);
   min-height: fit-content !important;
