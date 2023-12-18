@@ -250,9 +250,10 @@ const openWeb = (values) => {
 const menuButton = (action) => {
   const iframeVisible = document.body.classList.contains('iframe-open');
   const configVisible = document.body.classList.contains('show-config');
-  if (action === 'back' && !iframeVisible && !configVisible) getData({ backFrom: LAST_READED });
-  else if (action === 'more' && !iframeVisible && !configVisible) getData({});
-  else if (action === 'config' && !iframeVisible && !configVisible) openConfig();
+  const loadingItems  = document.body.classList.contains('items-loading');
+  if (action === 'back' && !iframeVisible && !configVisible && !loadingItems) getData({ backFrom: LAST_READED });
+  else if (action === 'more' && !iframeVisible && !configVisible && !loadingItems) getData({});
+  else if (action === 'config' && !iframeVisible && !configVisible && !loadingItems) openConfig();
   else if (action === 'share') shareIframe();
   else if (action === 'close') closeIframe();
 };
