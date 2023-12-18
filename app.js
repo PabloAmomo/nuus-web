@@ -49,12 +49,13 @@ const closeConfig = () => {
     if (oldFilter !== newFilter) {
       // Filter current data for user categories selection
       let data = localStorage.getItem('last-data');
+      let filter = JSON.parse(newFilter);
       if (data) {
         data = JSON.parse(data);
         data.feeds = data.feeds.filter((item) => {
           const { sourceId } = item;
           const source = data.sources.find((source) => source.id === sourceId);
-          return !newFilter.includes(source.type);
+          return !filter.includes(source.type);
         });
         // Use data to update items
         processItems(data);
@@ -73,14 +74,15 @@ const closeConfig = () => {
 const inputCategoryChange = (el) => {
   try {
     const { checked } = el;
-    const id = el.dataset.id;
+    const id = parseInt(el.dataset.id);
     // Read categories and remove or add category, then save in local storage
     let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
-    if (checked) filter.splice(filter.indexOf(parseInt(id)), 1);
-    else filter.push(parseInt(id));
+    let position = filter.indexOf(id);
+    if (checked && position >= 0) filter.splice(position, 1);
+    else if (!checked && !filter.includes(id)) filter.push(id);
+    // Order and save
     filter.sort((a, b) => a - b);
     localStorage.setItem('filter', JSON.stringify(filter));
-    console.log('filter', filter);
   } catch (err) {
     errorLog('inputChange', err);
   }
@@ -91,25 +93,31 @@ const createCategories = () => {
   const [categories, categoryPill] = ['config-categories', 'category-pill-template'].map((id) => document.getElementById(id));
   try {
     // Config - Select All - Deselect All
-    const allToState = (el, state) => ((el.checked = state), inputCategoryChange(el));
+    const setChecked = (el, state) => ((el.checked = state), inputCategoryChange(el));
     document
       .getElementById('config-categories-button-select-all')
-      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el) => allToState(el, true)));
+      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el) => setChecked(el, true)));
     document
       .getElementById('config-categories-button-deselect-all')
-      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el, idx) => idx > 0 && allToState(el, false)));
+      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el, idx) => setChecked(el, idx == 0)));
+    // Change evet
+    const clickEvent = (event) => {
+      event.stopPropagation();
+      if (document.querySelectorAll('.category-pill input:checked').length === 0) event.preventDefault();
+      else inputCategoryChange(event.target);
+    };
     // List of categories
-    let pill, newPill, input;
+    let newPill;
     for (let i = 1; i < CATEGORIES.length; i++) {
       newPill = document.createElement('div');
       newPill.innerHTML = categoryPill.innerHTML.replace('{{category}}', getLabel(CATEGORIES[i]));
-      pill = newPill.firstElementChild;
+      const pill = newPill.firstElementChild;
       pill.style.backgroundColor = `var(--color-${i})`;
       pill.dataset.id = i;
-      input = pill.querySelector('input');
+      const input = pill.querySelector('input');
       input.dataset.id = i;
-      pill.addEventListener('click', () => ((input.checked = !pill.querySelector('input').checked), inputCategoryChange(input)));
-      input.addEventListener('click', (event) => (event.stopPropagation(), inputCategoryChange(input)));
+      pill.addEventListener('click', () => pill.querySelector('input').click());
+      input.addEventListener('click', (event) => clickEvent(event));
       categories.appendChild(pill);
     }
   } catch (err) {
@@ -250,7 +258,7 @@ const openWeb = (values) => {
 const menuButton = (action) => {
   const iframeVisible = document.body.classList.contains('iframe-open');
   const configVisible = document.body.classList.contains('show-config');
-  const loadingItems  = document.body.classList.contains('items-loading');
+  const loadingItems = document.body.classList.contains('items-loading');
   if (action === 'back' && !iframeVisible && !configVisible && !loadingItems) getData({ backFrom: LAST_READED });
   else if (action === 'more' && !iframeVisible && !configVisible && !loadingItems) getData({});
   else if (action === 'config' && !iframeVisible && !configVisible && !loadingItems) openConfig();
@@ -277,9 +285,11 @@ const respondWhenVisible = (element, ignoreIfClass, callback) => {
 
 // Set item as readed
 const setReaded = (feedsId) => {
-  fetchWithTimeout(API_READED_URL, { method: 'POST', headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' }, body: JSON.stringify({ feedsId }) }).catch((err) =>
-    console.log('error marked readed item(s)', feedsId, err)
-  );
+  fetchWithTimeout(API_READED_URL, {
+    method: 'POST',
+    headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ feedsId }),
+  }).catch((err) => errorLog('setReaded', err, 'errorMarkReaded'));
 };
 
 // Get current user (Or set if not exists)
@@ -630,6 +640,7 @@ const LABELS = {
   errorIn: 'Error en',
   selectAll: 'todas',
   deselectAll: 'ninguna',
+  errorMarkReaded: 'Error marcando leída la noticia',
 };
 
 // Categories
