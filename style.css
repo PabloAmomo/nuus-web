@@ -281,6 +281,8 @@ body.iframe-loading:not(.iframe-ready):not(.iframe-error) #iframe-loading {
   overflow-y: scroll;
   flex-wrap: nowrap;
   gap: var(--list-gap);
+  border-top: 1px solid var(--gray-light);
+  box-shadow: inset 0px 5px 5px var(--gray-light);
 }
 body.loading .list-items-container {
   overflow-y: hidden;
