@@ -19,7 +19,7 @@ const init = () => {
     // Add placeholder to all items with data-placeholder attribute and label for all elements with data-label attribute
     document.body.querySelectorAll('[data-placeholder]').forEach((el) => el.setAttribute('placeholder', getLabel(el.getAttribute('data-placeholder'))));
     document.body.querySelectorAll('[data-label]').forEach((el) => (el.innerText = getLabel(el.getAttribute('data-label'))));
-    // update text of time every second
+    // update text of time every 5 second
     setInterval(() => document.querySelectorAll('[data-timestamp]').forEach((el) => (el.innerText = dateText(el.getAttribute('data-timestamp')))), 5000);
     // Create scrollables Items
     createScrollableItems();
