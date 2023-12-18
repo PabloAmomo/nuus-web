@@ -276,7 +276,11 @@ const respondWhenVisible = (element, ignoreIfClass, callback) => {
 
 // Set item as readed
 const setReaded = (feedsId) => {
-  fetchWithTimeout(API_READED_URL.replace('{{feedsId}}', feedsId), { method: 'POST', headers: { 'x-user': currentUser() } }).catch((err) =>
+  fetchWithTimeout(API_READED_URL, { 
+      method: 'POST', 
+      headers: { 'x-user': currentUser() },
+      body: JSON.stringify({ feedsId })
+    }).catch((err) =>
     console.log('error marked readed item(s)', feedsId, err)
   );
 };
@@ -585,7 +589,7 @@ const polyfill = () => {
 // Constants
 let LAST_READED = null;
 const API_ITEMS_URL = `${BASE_URL}/feeds?count={{count}}&back={{backFrom}}&filter={{filter}}`;
-const API_READED_URL = `${BASE_URL}/feeds/readed?feedsId={{feedsId}}`;
+const API_READED_URL = `${BASE_URL}/feeds/readed`;
 const [ITEM_TEMPLATE, ITEMS_CONTAINER] = ['item-template', 'list-items-container'].map((id) => document.getElementById(id));
 
 // Labels
