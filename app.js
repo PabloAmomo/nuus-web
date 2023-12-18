@@ -28,6 +28,8 @@ const init = () => {
     document.getElementById('config-email-input').addEventListener('change', (event) => localStorage.setItem('email', event.target.value));
     // Create Categories
     createCategories();
+    // Set filter state
+    if (JSON.parse(localStorage.getItem('filter') ?? '[]').length > 0) document.body.classList.add('filter-on');
     // Load items
     getData({ useCache: true });
   } catch (err) {
@@ -46,10 +48,13 @@ const closeConfig = () => {
   try {
     const oldFilter = localStorage.getItem('old-filter') ?? '[]';
     const newFilter = localStorage.getItem('filter') ?? '[]';
+    const filter = JSON.parse(newFilter);
+    // Set filter state
+    if (filter.length > 0) document.body.classList.add('filter-on');
+    else document.body.classList.remove('filter-on');
+    // If filter changed, filter the current data
     if (oldFilter !== newFilter) {
-      // Filter current data for user categories selection
       let data = localStorage.getItem('last-data');
-      let filter = JSON.parse(newFilter);
       if (data) {
         data = JSON.parse(data);
         data.feeds = data.feeds.filter((item) => {
@@ -256,12 +261,11 @@ const openWeb = (values) => {
 
 // Actions on menu button click
 const menuButton = (action) => {
-  const iframeVisible = document.body.classList.contains('iframe-open');
-  const configVisible = document.body.classList.contains('show-config');
-  const loadingItems = document.body.classList.contains('items-loading');
-  if (action === 'back' && !iframeVisible && !configVisible && !loadingItems) getData({ backFrom: LAST_READED });
-  else if (action === 'more' && !iframeVisible && !configVisible && !loadingItems) getData({});
-  else if (action === 'config' && !iframeVisible && !configVisible && !loadingItems) openConfig();
+  const inactive =
+    document.body.classList.contains('iframe-open') || document.body.classList.contains('show-config') || document.body.classList.contains('items-loading');
+  if (action === 'back' && !inactive) getData({ backFrom: LAST_READED });
+  else if (action === 'more' && !inactive) getData({});
+  else if (action === 'config' && !inactive) openConfig();
   else if (action === 'share') shareIframe();
   else if (action === 'close') closeIframe();
 };
@@ -285,11 +289,10 @@ const respondWhenVisible = (element, ignoreIfClass, callback) => {
 
 // Set item as readed
 const setReaded = (feedsId) => {
-  fetchWithTimeout(API_READED_URL, {
-    method: 'POST',
-    headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ feedsId }),
-  }).catch((err) => errorLog('setReaded', err, 'errorMarkReaded'));
+  const body = JSON.stringify({ feedsId });
+  fetchWithTimeout(API_READED_URL, { method: 'POST', headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' }, body }).catch((err) =>
+    errorLog('setReaded', err, 'errorMarkReaded')
+  );
 };
 
 // Get current user (Or set if not exists)

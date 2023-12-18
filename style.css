@@ -46,6 +46,7 @@
   --menu-height: 3rem;
   --menu-background-color: #363636;
   --menu-button-color: var(--white);
+  --menu-config-filter-on-background-color: #ceffce;
   /* LOADERS */
   --linear-loader-line: var(--blue);
   --linear-loader-background: #ffffff80;
@@ -242,6 +243,16 @@ body.mobile .first-icon svg,
 body.mobile .second-icon svg {
   width: 100%!important;
   height: 100%!important;
+}
+body.filter-on .button-config .first-icon::before {
+  content: '';
+  background-color: var(--menu-config-filter-on-background-color);
+  position: absolute;
+  top: .5rem;
+  right: -1.1rem;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
 }
 
 /* --------------- */
