@@ -276,11 +276,7 @@ const respondWhenVisible = (element, ignoreIfClass, callback) => {
 
 // Set item as readed
 const setReaded = (feedsId) => {
-  fetchWithTimeout(API_READED_URL, { 
-      method: 'POST', 
-      headers: { 'x-user': currentUser() },
-      body: JSON.stringify({ feedsId })
-    }).catch((err) =>
+  fetchWithTimeout(API_READED_URL, { method: 'POST', headers: { 'x-user': currentUser() }, body: JSON.stringify({ feedsId }) }).catch((err) =>
     console.log('error marked readed item(s)', feedsId, err)
   );
 };
@@ -453,7 +449,7 @@ const addItem = (values) => {
     const item = document.createElement('div');
     item.addEventListener('click', () => {
       if (document.body.classList.contains('items-loading')) return;
-      (iFrame ? openWeb(values) : openOnIframe({ ...values, replace: null, iFrame: null }))
+      iFrame ? openWeb(values) : openOnIframe({ ...values, replace: null, iFrame: null });
     });
     if (iFrame) item.classList.add('iframe-mode');
     item.classList.add('list-item');
