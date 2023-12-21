@@ -263,7 +263,7 @@ const openWeb = (values) => {
 const menuButton = (action) => {
   const inactive =
     document.body.classList.contains('iframe-open') || document.body.classList.contains('show-config') || document.body.classList.contains('items-loading');
-  if (action === 'back' && !inactive) getData({ backFrom: LAST_READED });
+  if (action === 'back' && !inactive) getData({ itemsBack: LAST_READED });
   else if (action === 'more' && !inactive) getData({});
   else if (action === 'config' && !inactive) openConfig();
   else if (action === 'share') shareIframe();
@@ -289,6 +289,10 @@ const respondWhenVisible = (element, ignoreIfClass, callback) => {
 
 // Set item as readed
 const setReaded = (feedsId) => {
+  if (!feedsId) return;
+  // If is in Back mode, don't send
+  if (document.body.classList.contains('items-back')) return;
+  // Send readed items to API
   const body = JSON.stringify({ feedsId });
   fetchWithTimeout(API_READED_URL, { method: 'POST', headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' }, body }).catch((err) =>
     errorLog('setReaded', err, 'errorMarkReaded')
@@ -361,17 +365,21 @@ const getFirstImage = (images) => {
 };
 
 // Get data from API
-const getData = ({ backFrom = '', useCache = false }) => {
+const getData = ({ itemsBack = '', useCache = false }) => {
   // start load items
   document.body.classList.add('items-loading');
 
   // Data received from API
   let data = null;
 
+  // Set if working with back data or not
+  if (itemsBack) document.body.classList.add('items-back');
+  else document.body.classList.remove('items-back');
+
   // Call to API
   fetchWithTimeout(
     API_ITEMS_URL.replace('{{count}}', 20)
-      .replace('{{backFrom}}', backFrom)
+      .replace('{{itemsBack}}', itemsBack)
       .replace('{{filter}}', JSON.parse(localStorage.getItem('filter') ?? '[]').join(',')),
     { method: 'GET', headers: { 'x-user': currentUser() } }
   )
@@ -454,7 +462,7 @@ const getLabel = (label) => LABELS[label] ?? `*${label}*`;
 const addItem = (values) => {
   if (values.id == null) return errorLog('addItem', { error: 'id is null' }, values);
   try {
-    let { id, url, title, summary, image, sourceIcon, sourceType, iFrame, replace } = values;
+    let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, replace } = values;
     // Replace values in template
     let html = ITEM_TEMPLATE.innerHTML;
     for (let key in values) html = html.replaceAll(`{{${key}}}`, values[key]);
@@ -498,7 +506,7 @@ const addItem = (values) => {
     else if (iFrame) iFrame.appendChild(item);
     else ITEMS_CONTAINER.insertBefore(item, ITEMS_CONTAINER.querySelector('.list-finish'));
     // Set read when item is visible
-    respondWhenVisible(item, 'processing-items', () => setReaded(id));
+    if (!iFrame && idx > 2) respondWhenVisible(item, 'processing-items', () => setReaded(id));
   } catch (err) {
     errorLog('addItem', err);
   }
@@ -536,7 +544,15 @@ const processItems = (data) => {
     [...document.querySelectorAll('.list-item')].forEach((item) => item.classList.add('to-remove'));
     const itemsToRemove = [...document.querySelectorAll('.list-item.to-remove')];
     // Add new items (Replacing old ones) and remove remaining
-    items && items.forEach((item) => addItem({ ...getItemData(item, sources), replace: itemsToRemove.shift() ?? null }));
+    const procceedItems = [];
+    if (items && items.length > 0) {
+      items.forEach((item, idx) => {
+        procceedItems.push({ id: item.id, published: item.publish });
+        addItem({ idx, ...getItemData(item, sources), replace: itemsToRemove.shift() ?? null });
+      });
+      LAST_READED = items[0].id;
+    }
+    // Remove remaining items
     itemsToRemove && itemsToRemove.forEach((item) => item.remove());
     // If no items, add class to body or remove, if exists
     if (!items || items.length === 0) document.body.classList.add('no-items');
@@ -544,10 +560,7 @@ const processItems = (data) => {
     // Set as readed the first 3 items
     const readedToSend = [];
     items?.slice(0, 3)?.forEach((item) => readedToSend.push(item.id));
-    if (readedToSend.length > 0) {
-      LAST_READED = readedToSend[0];
-      setReaded(readedToSend.join(','));
-    }
+    if (readedToSend.length > 0) setReaded(readedToSend.join(','));
   } catch (err) {
     errorLog('processItems', err);
   }
@@ -598,7 +611,7 @@ const polyfill = () => {
 
 // Constants
 let LAST_READED = null;
-const API_ITEMS_URL = `${BASE_URL}/feeds?count={{count}}&back={{backFrom}}&filter={{filter}}`;
+const API_ITEMS_URL = `${BASE_URL}/feeds?count={{count}}&back={{itemsBack}}&filter={{filter}}`;
 const API_READED_URL = `${BASE_URL}/feeds-readed`;
 const [ITEM_TEMPLATE, ITEMS_CONTAINER] = ['item-template', 'list-items-container'].map((id) => document.getElementById(id));
 
