@@ -693,6 +693,7 @@ body.show-config #config {
 }
 body.show-config #config .config-container {
   overflow-y: auto;
+  min-width: 320px;
 }
 #config-email-input {
   border: 1px solid var(--gray-light);
