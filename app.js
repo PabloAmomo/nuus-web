@@ -566,6 +566,8 @@ const processItems = (data) => {
       });
       LAST_READED = items[0].id;
     }
+    // DEBUG: Show items processed
+    // console.log('Items processed:', procceedItems);
     // Remove remaining items
     itemsToRemove && itemsToRemove.forEach((item) => item.remove());
     // If no items, add class to body or remove, if exists

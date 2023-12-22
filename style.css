@@ -505,7 +505,7 @@ body.no-share .item-footer .share-all {
   display: none !important;
 }
 .list-item.iframe-mode .summary {
-  padding-bottom: 2rem;
+  padding-bottom: 8rem;
 }
 .list-item.iframe-mode .click-to-go,
 .list-item.iframe-mode .summary {
