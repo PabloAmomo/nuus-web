@@ -104,6 +104,18 @@ body {
 }
 
 /* --------------- */
+/* TOP SHADOW      */
+/* --------------- */
+#top-shadow {
+  top: 2;
+  left: 0;
+  right: 0;
+  height: .5rem;
+  background: linear-gradient(to bottom, rgb(82 82 82 / 56%) 0%,rgba(0,0,0,0) 100%);
+
+}
+
+/* --------------- */
 /* GOTO TOP        */
 /* --------------- */
 .goto-top {
@@ -156,8 +168,8 @@ body.mobile .btn {
   padding: 1rem 1.5rem 1rem 1.5rem;
 }
 .btn.btn-small {
-  font-size: .75rem!important;
-  padding: 0.75rem 1rem 0.75rem 1rem!important;
+  font-size: 0.75rem !important;
+  padding: 0.75rem 1rem 0.75rem 1rem !important;
   width: 6rem;
 }
 .btn.rounded-close {
@@ -165,7 +177,7 @@ body.mobile .btn {
   color: transparent;
   width: 2.5rem;
   height: 2.5rem;
-  padding: 0!important;
+  padding: 0 !important;
   border: 2px solid var(--button-close-border-color);
   background-color: var(--button-close-background-color);
   position: relative;
@@ -230,25 +242,25 @@ body:not(.iframe-open) .disable-no-iframe-open {
   height: 22px;
 }
 body.mobile .first-icon {
-  width: 70%!important;
-  height: 70%!important;
-  padding-top: 10%!important;
+  width: 70% !important;
+  height: 70% !important;
+  padding-top: 10% !important;
 }
 body.mobile .second-icon {
-  width: 60%!important;
-  height: 60%!important;
-  padding-bottom: 10%!important;
+  width: 60% !important;
+  height: 60% !important;
+  padding-bottom: 10% !important;
 }
 body.mobile .first-icon svg,
 body.mobile .second-icon svg {
-  width: 100%!important;
-  height: 100%!important;
+  width: 100% !important;
+  height: 100% !important;
 }
 body.filter-on .button-config .first-icon::before {
   content: '';
   background-color: var(--menu-config-filter-on-background-color);
   position: absolute;
-  top: .5rem;
+  top: 0.5rem;
   right: -1.1rem;
   width: 20px;
   height: 20px;
@@ -291,7 +303,7 @@ body.iframe-loading:not(.iframe-ready):not(.iframe-error) #iframe-loading {
   flex-wrap: nowrap;
   gap: var(--list-gap);
   border-top: 1px solid var(--gray-light);
-  box-shadow: inset 0px 5px 5px var(--gray-light);
+  padding-top: 0.25rem;
 }
 body.loading .list-items-container {
   overflow-y: hidden;
@@ -309,12 +321,12 @@ body.no-items .list-finish {
   display: none !important;
 }
 body.items-loading .list-finish .button-more {
-  display: none!important;
+  display: none !important;
 }
 body.loading .list-finish .circular-loader,
 body:not(.items-loading) .list-finish .circular-loader {
   display: none;
-} 
+}
 .list-finish {
   background-color: var(--list-finish-background-color);
   min-height: fit-content !important;
@@ -335,6 +347,10 @@ body.no-items .list-no-items {
     justify-content: center !important;
     flex-direction: row !important;
     flex-wrap: wrap;
+  }
+  body.mobile .list-item {
+    /* Force 2 items per row when landscape */
+    max-width: calc(50% - var(--list-gap)) !important;
   }
   .list-item {
     max-width: calc(50% - var(--list-gap));
@@ -698,11 +714,11 @@ body.show-config #config .config-container {
 #config-email-input {
   border: 1px solid var(--gray-light);
 }
-#config-categories { 
+#config-categories {
   margin-top: 1rem;
   min-height: 10rem;
   overflow: auto;
-  column-gap: 4rem!important;
+  column-gap: 4rem !important;
 }
 .config-category-item {
   display: flex;
@@ -717,8 +733,8 @@ body.show-config #config .config-container {
   margin-bottom: 1rem;
 }
 @media screen and (max-width: 420px) {
-  #config-categories { 
-    column-gap: 2rem!important;
+  #config-categories {
+    column-gap: 2rem !important;
   }
   .category-pill {
     font-size: 12px;
