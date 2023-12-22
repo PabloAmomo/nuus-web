@@ -263,7 +263,7 @@ const openWeb = (values) => {
 const menuButton = (action) => {
   const inactive =
     document.body.classList.contains('iframe-open') || document.body.classList.contains('show-config') || document.body.classList.contains('items-loading');
-  if (action === 'back' && !inactive) getData({ itemsBack: LAST_READED });
+  if (action === 'back' && !inactive) getData({ itemsBack: LAST_READED ?? 999999999999 });
   else if (action === 'more' && !inactive) getData({});
   else if (action === 'config' && !inactive) openConfig();
   else if (action === 'share') shareIframe();
@@ -458,20 +458,34 @@ const imageCheck = (type, item, img) => {
 // Get label
 const getLabel = (label) => LABELS[label] ?? `*${label}*`;
 
+// Convert html to plain text
+function convertToPlain(html){
+  var tempDivElement = document.createElement("div");
+  tempDivElement.innerHTML = html;
+  return tempDivElement.textContent || tempDivElement.innerText || "";
+}
+
+
 // Add item to list
 const addItem = (values) => {
   if (values.id == null) return errorLog('addItem', { error: 'id is null' }, values);
   try {
-    let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, replace } = values;
+    // Convert summary to plain text (And remove replace('$')
+    values.summary = convertToPlain(values.summary).replaceAll('replace(\'$\'', '');
+    // Get values
+    let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, insertOn } = values;
     // Replace values in template
     let html = ITEM_TEMPLATE.innerHTML;
-    for (let key in values) html = html.replaceAll(`{{${key}}}`, values[key]);
+    ['author', 'date', 'id', 'idx', 'image', 'sourceIcon', 'sourceName', 'sourceType', 'sourceTypeLabel', 'summary', 'timestamp', 'title', 'url'].forEach((key) => {
+      html = html.replaceAll(`{{${key}}}`, values[key]);
+    });
+    // Replace labels
     html = html.replaceAll('{{clickToGo}}', getLabel('clickToGo'));
     // Create new list item
     const item = document.createElement('div');
     item.addEventListener('click', () => {
       if (document.body.classList.contains('items-loading')) return;
-      iFrame ? openWeb(values) : openOnIframe({ ...values, replace: null, iFrame: null });
+      iFrame ? openWeb(values) : openOnIframe({ ...values, insertOn: null, iFrame: null });
     });
     if (iFrame) item.classList.add('iframe-mode');
     item.classList.add('list-item');
@@ -502,7 +516,7 @@ const addItem = (values) => {
       });
     });
     // Add item to list
-    if (replace) replace.replaceWith(item);
+    if (insertOn) insertOn.replaceWith(item);
     else if (iFrame) iFrame.appendChild(item);
     else ITEMS_CONTAINER.insertBefore(item, ITEMS_CONTAINER.querySelector('.list-finish'));
     // Set read when item is visible
@@ -548,7 +562,7 @@ const processItems = (data) => {
     if (items && items.length > 0) {
       items.forEach((item, idx) => {
         procceedItems.push({ id: item.id, published: item.publish });
-        addItem({ idx, ...getItemData(item, sources), replace: itemsToRemove.shift() ?? null });
+        addItem({ idx, ...getItemData(item, sources), insertOn: itemsToRemove.shift() ?? null });
       });
       LAST_READED = items[0].id;
     }
