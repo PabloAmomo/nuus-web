@@ -21,7 +21,7 @@
     <!-- WEB MANIFEST -->
     <link rel="manifest" href="webmanifest.json" />
   </head>
-  <body class="loading">
+  <body class="loading mobile">
     <!-- ITEMS -->
     <div
       id="list-items-container"
@@ -48,8 +48,8 @@
       </div>
     </div>
 
-    <!-- TOP SHADOW -->
-    <div class="position-absolute" id="top-shadow"></div>
+    <!-- TOP SHADOW  (ITEMS) -->
+    <div class="position-absolute top-shadow" id="top-shadow-item"></div>
 
     <!-- ITEMS LOADING -->
     <div id="items-loading" class="linear-loader-container overflow-hidden top-0 left-0 right-0 position-fixed">
@@ -74,6 +74,9 @@
         <div class="circular-loader"></div>
       </div>
     </div>
+
+    <!-- TOP SHADOW  (IFRAME) -->
+    <div class="position-absolute top-shadow" id="top-shadow-iframe"></div>
 
     <!-- MENU -->
     <div id="menu-container" class="flex position-fixed bottom-0 left-0 right-0">

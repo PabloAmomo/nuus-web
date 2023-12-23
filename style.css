@@ -102,12 +102,15 @@ body {
   position: relative;
   overscroll-behavior: none;
 }
+body.mobile {
+  border-top: 1px solid var(--gray-light);
+}
 
 /* --------------- */
 /* TOP SHADOW      */
 /* --------------- */
-#top-shadow {
-  top: 2;
+.top-shadow {
+  top: -1px;
   left: 0;
   right: 0;
   height: .5rem;
@@ -115,7 +118,8 @@ body {
   transition: all 0.25s ease-in-out;
   opacity: 0;
 }
-.list-items-container.on-scroll + #top-shadow {
+.list-items-container.on-scroll + #top-shadow-item,
+#iframe-container.on-scroll + #top-shadow-iframe {
   opacity: 1;
 }
 
@@ -260,15 +264,33 @@ body.mobile .second-icon svg {
   width: 100% !important;
   height: 100% !important;
 }
+body.filter-on .first-icon svg,
+body.filter-on .second-icon svg {
+  fill: var(--menu-config-filter-on-background-color);
+}
 body.filter-on .button-config .first-icon::before {
   content: '';
   background-color: var(--menu-config-filter-on-background-color);
   position: absolute;
-  top: 0.5rem;
+  top: 0.25rem;
   right: -1.1rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+body.filter-on.mobile .button-config .first-icon::before {
+  top: 0.6rem;
+  right: -1.4rem;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+}
+@media screen and (max-width: 320px) { 
+  body.filter-on.mobile .button-config .first-icon::before {
+    top: 1rem;
+    right: -1rem;
+    width: 12px;
+    height: 12px;
+  }
 }
 
 /* --------------- */
@@ -306,7 +328,7 @@ body.iframe-loading:not(.iframe-ready):not(.iframe-error) #iframe-loading {
   overflow-y: scroll;
   flex-wrap: nowrap;
   gap: var(--list-gap);
-  border-top: 1px solid var(--gray-light);
+  /* border-top: 1px solid var(--gray-light); */
   padding-top: 0.25rem;
 }
 body.loading .list-items-container {
