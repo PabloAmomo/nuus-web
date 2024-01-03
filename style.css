@@ -691,6 +691,7 @@ body.loading #loading {
 }
 .toast .toast-close svg {
   fill: var(--black-light);
+  color: var(--black-light);
 }
 .toast.show {
   bottom: calc(var(--menu-height) + 6rem);
