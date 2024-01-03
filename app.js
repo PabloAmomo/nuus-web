@@ -448,8 +448,12 @@ const imageCheck = (type, item, img) => {
     else if (type == 'image' && img.naturalWidth <= 400) item.classList.add('image-small');
     else if (type == 'image' && img.naturalHeight > img.naturalWidth) item.classList.add('image-small', 'image-vertical');
     else item.classList.remove('image-small');
-    // Need to set max-height for small images to respect aspect ratio
-    if (type == 'image' && item.classList.contains('image-small')) img.style.maxHeight = `${parseInt(35 / (img.naturalWidth / img.naturalHeight))}vw`;
+    // Need to set max-height for small images to respect aspect ratio (Max 50% of width)
+    if (type == 'image' && item.classList.contains('image-small')) {
+      let maxHeight = parseInt(35 / (img.naturalWidth / img.naturalHeight));
+      if (maxHeight > 50) maxHeight = 50;
+      img.style.maxHeight = `${maxHeight}vw`;
+    }
   } catch (err) {
     errorLog('imageCheck', err);
   }
