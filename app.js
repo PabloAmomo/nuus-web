@@ -182,7 +182,11 @@ const openOnIframe = (values) => {
     addItem(values);
     // Create and set iframe
     iFrame = createIframe(values);
-    if (!iFrame) return;
+    if (!iFrame) {
+      document.body.classList.remove('iframe-loading');
+      document.body.classList.add('iframe-error');
+      return;
+    };
     // Wait for iframe load (Interval 250 to 750)
     const start = Date.now();
     const checkIfReady = () => {
