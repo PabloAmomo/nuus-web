@@ -240,6 +240,7 @@ body.mobile .menu-button svg {
 }
 body.items-loading .disable-items-loading,
 body.iframe-open .disable-iframe-open,
+body.iframe-no-url .disable-no-url,
 body:not(.iframe-open) .disable-no-iframe-open {
   opacity: 0.3;
   cursor: not-allowed !important;
@@ -481,6 +482,9 @@ body.iframe-open #iframe-item .item-body .click-to-go {
   display: flex;
   justify-content: center;
 }
+#iframe-item .no-url .click-to-go {
+  display: none!important;
+}
 .item-header .title {
   font-size: var(--title-font-size);
   color: var(--title-font-color);
@@ -509,6 +513,9 @@ body.iframe-open #iframe-item .item-body .click-to-go {
   font-size: var(--date-font-size);
   color: var(--date-font-color);
 }
+.item-footer {
+  min-height: 42px;
+}
 .item-footer .source {
   padding-top: 4px;
 }
@@ -536,6 +543,8 @@ body.iframe-open #iframe-item .item-body .click-to-go {
   padding: 0 0.5rem 0 0.5rem;
   line-height: 24px;
 }
+.no-url .share-all,
+.no-url .share-email,
 body.no-share .item-footer .share-all {
   display: none !important;
 }

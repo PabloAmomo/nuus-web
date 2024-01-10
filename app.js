@@ -167,7 +167,7 @@ const showToast = (message) => {
 
 // Close iframe
 const closeIframe = () => {
-  document.body.classList.remove('iframe-loading', 'iframe-open', 'iframe-error', 'iframe-ready');
+  document.body.classList.remove('iframe-loading', 'iframe-open', 'iframe-error', 'iframe-ready', 'iframe-no-url');
   setTimeout(() => document.getElementById('item-iframe')?.remove(), 500);
 };
 
@@ -175,6 +175,8 @@ const closeIframe = () => {
 const openOnIframe = (values) => {
   try {
     document.body.classList.add('iframe-open', 'iframe-loading');
+    // Check if url is present
+    if (values.url == '') { document.body.classList.add('iframe-no-url'); }
     // Add item preventing iframe load error
     let iFrame = document.getElementById('iframe-item');
     values = { ...values, iFrame }; // Clean replace, used only on items list
@@ -259,6 +261,7 @@ const shareIframe = () => {
 
 // Open new webbrowser window with url from iframe
 const openWeb = (values) => {
+  if ((values?.url ?? values) == '') return;
   window.open(values?.url ?? values, '_blank');
   closeIframe();
 };
@@ -495,6 +498,7 @@ const addItem = (values) => {
       if (document.body.classList.contains('items-loading')) return;
       iFrame ? openWeb(values) : openOnIframe({ ...values, insertOn: null, iFrame: null });
     });
+    if (url == '') item.classList.add('no-url');
     if (iFrame) item.classList.add('iframe-mode');
     item.classList.add('list-item');
     item.innerHTML = html;
