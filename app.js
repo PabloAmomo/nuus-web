@@ -180,7 +180,9 @@ const openOnIframe = (values) => {
   try {
     document.body.classList.add('iframe-open', 'iframe-loading');
     // Check if url is present
-    if (values.url == '') { document.body.classList.add('iframe-no-url'); }
+    if (values.url == '') {
+      document.body.classList.add('iframe-no-url');
+    }
     // Add item preventing iframe load error
     let iFrame = document.getElementById('iframe-item');
     values = { ...values, iFrame }; // Clean replace, used only on items list
@@ -192,7 +194,7 @@ const openOnIframe = (values) => {
       document.body.classList.remove('iframe-loading');
       document.body.classList.add('iframe-error');
       return;
-    };
+    }
     // Wait for iframe load (Interval 250 to 750)
     const start = Date.now();
     const checkIfReady = () => {
@@ -308,7 +310,6 @@ const setReaded = (feedsId) => {
   fetchWithTimeout(API_READED_URL, { method: 'POST', headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' }, body }).catch((err) =>
     errorLog('setReaded', err, 'errorMarkReaded')
   );
-  errorLog('setReaded', null, 'errorMarkReaded')
 };
 
 // Get current user (Or set if not exists)
@@ -475,26 +476,27 @@ const imageCheck = (type, item, img) => {
 const getLabel = (label) => LABELS[label] ?? `*${label}*`;
 
 // Convert html to plain text
-function convertToPlain(html){
-  var tempDivElement = document.createElement("div");
+function convertToPlain(html) {
+  var tempDivElement = document.createElement('div');
   tempDivElement.innerHTML = html;
-  return tempDivElement.textContent || tempDivElement.innerText || "";
+  return tempDivElement.textContent || tempDivElement.innerText || '';
 }
-
 
 // Add item to list
 const addItem = (values) => {
   if (values.id == null) return errorLog('addItem', { error: 'id is null' }, values);
   try {
     // Convert summary to plain text (And remove replace('$')
-    values.summary = convertToPlain(values.summary).replaceAll('replace(\'$\'', '');
+    values.summary = convertToPlain(values.summary).replaceAll("replace('$'", '');
     // Get values
     let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, insertOn } = values;
     // Replace values in template
     let html = ITEM_TEMPLATE.innerHTML;
-    ['author', 'date', 'id', 'idx', 'image', 'sourceIcon', 'sourceName', 'sourceType', 'sourceTypeLabel', 'summary', 'timestamp', 'title', 'url'].forEach((key) => {
-      html = html.replaceAll(`{{${key}}}`, values[key]);
-    });
+    ['author', 'date', 'id', 'idx', 'image', 'sourceIcon', 'sourceName', 'sourceType', 'sourceTypeLabel', 'summary', 'timestamp', 'title', 'url'].forEach(
+      (key) => {
+        html = html.replaceAll(`{{${key}}}`, values[key]);
+      }
+    );
     // Replace labels
     html = html.replaceAll('{{clickToGo}}', getLabel('clickToGo'));
     // Create new list item
