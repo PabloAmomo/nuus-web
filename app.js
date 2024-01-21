@@ -1,5 +1,6 @@
 'use strict';
 const BASE_URL = 'https://feedapi.yatchapp.dev';
+const LAST_ERROR = { type: '', time: 0 };
 
 // Entry point for the application
 const init = () => {
@@ -39,6 +40,9 @@ const init = () => {
 
 // Error log
 const errorLog = (location, err, label) => {
+  if (LAST_ERROR.type === `${location}-${label}` && Date.now() - LAST_ERROR.time < 2500) return;
+  LAST_ERROR.type = `${location}-${label}`;
+  LAST_ERROR.time = Date.now();
   console.log(`${location} error:`, err);
   showToast(label ? getLabel(label) : `${getLabel('errorIn')} ${location}`);
 };
@@ -157,7 +161,7 @@ const showToast = (message) => {
     const toastContainer = document.createElement('div');
     toastContainer.innerHTML = document.getElementById('toast-template').innerHTML.replaceAll('{{message}}', message);
     const toast = toastContainer.firstElementChild;
-    toast.querySelector('.toast-close').addEventListener('click', () => (toast.classList.remove('show'), setTimeout(() => toast.remove(), 750)));
+    toast.addEventListener('click', () => (toast.classList.remove('show'), setTimeout(() => toast.remove(), 750)));
     document.body.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
   } catch (err) {
@@ -304,6 +308,7 @@ const setReaded = (feedsId) => {
   fetchWithTimeout(API_READED_URL, { method: 'POST', headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' }, body }).catch((err) =>
     errorLog('setReaded', err, 'errorMarkReaded')
   );
+  errorLog('setReaded', null, 'errorMarkReaded')
 };
 
 // Get current user (Or set if not exists)
@@ -424,7 +429,7 @@ const fetchWithTimeout = async (resource, options = {}) => {
     clearTimeout(timeoutId);
     return response;
   } catch (err) {
-    errorLog('fetchWithTimeout', err);
+    throw err;
   }
 };
 
@@ -670,8 +675,8 @@ const LABELS = {
   minute: 'minuto(s)',
   second: 'segundo(s)',
   now: 'ahora mismo',
-  errorRefreshing: 'Error recuperando noticias',
-  errorProcessing: 'Error procesando noticias',
+  errorRefreshing: 'No estoy pudiendo recuperar las nuevas noticias...',
+  errorProcessing: 'No he podido procesar las noticias recibidas...',
   refresh: 'Recargar',
   clickToGo: '>> Click para ir a la web del artículo <<',
   enterEmail: 'Introduce tu email...',
@@ -681,10 +686,10 @@ const LABELS = {
   close: 'Cerrar',
   email: 'Email',
   categories: 'Categorías',
-  errorIn: 'Error en',
+  errorIn: 'Tengo problemas en',
   selectAll: 'todas',
   deselectAll: 'ninguna',
-  errorMarkReaded: 'Error marcando leída la noticia',
+  errorMarkReaded: 'Tengo problemas para marcar las noticas como leídas...',
 };
 
 // Categories
