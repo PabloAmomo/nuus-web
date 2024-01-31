@@ -479,7 +479,7 @@ const getLabel = (label) => LABELS[label] ?? `*${label}*`;
 function convertToPlain(html) {
   var tempDivElement = document.createElement('div');
   tempDivElement.innerHTML = html;
-  return (tempDivElement.textContent || tempDivElement.innerText || '').replace(/<[^>]*>/g, '');
+  return (tempDivElement.textContent || tempDivElement.innerText || '').replace(/<[^>]*>/g, '').replaceAll("replace('$'", '');
 }
 
 // Add item to list
@@ -487,7 +487,7 @@ const addItem = (values) => {
   if (values.id == null) return errorLog('addItem', { error: 'id is null' }, values);
   try {
     // Convert summary to plain text (And remove replace('$')
-    values.summary = convertToPlain(values.summary).replaceAll("replace('$'", '');
+    values.summary = convertToPlain(values.summary);
     // Get values
     let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, insertOn } = values;
     // Replace values in template
