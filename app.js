@@ -479,7 +479,7 @@ const getLabel = (label) => LABELS[label] ?? `*${label}*`;
 function convertToPlain(html) {
   var tempDivElement = document.createElement('div');
   tempDivElement.innerHTML = html;
-  return tempDivElement.textContent || tempDivElement.innerText || '';
+  return (tempDivElement.textContent || tempDivElement.innerText || '').replace(/<[^>]*>/g, '');
 }
 
 // Add item to list
