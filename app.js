@@ -460,7 +460,7 @@ const imageCheck = (type, item, img) => {
     else if (type == 'source-icon' && img.width <= 64) item.querySelectorAll('.list-item .source-name').forEach((el) => el.classList.remove('hide'));
     else if (type == 'image' && img.naturalWidth <= 400) item.classList.add('image-small');
     else if (type == 'image' && img.naturalHeight > img.naturalWidth) item.classList.add('image-small', 'image-vertical');
-    else item.classList.remove('image-small');
+    else if (type == 'image') item.classList.remove('image-small');
     // Need to set max-height for small images to respect aspect ratio (Max 50% of width)
     if (type == 'image' && item.classList.contains('image-small')) {
       let maxHeight = parseInt(35 / (img.naturalWidth / img.naturalHeight));
