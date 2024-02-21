@@ -489,6 +489,7 @@ const addItem = (values) => {
   try {
     // Convert summary to plain text (And remove replace('$')
     values.summary = convertToPlain(values.summary);
+    values.title = convertToPlain(values.title);
     // Get values
     let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, insertOn } = values;
     // TEST: Custom image
