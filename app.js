@@ -5,121 +5,249 @@ const LAST_ERROR = { type: '', time: 0 };
 // Entry point for the application
 const init = () => {
   try {
-    // App title
-    document.title = getLabel('title');
-    // Pollyfill for functions not supported on all browsers
-    polyfill();
-    // Define if we runnig on mobile or not
-    if (isMobile()) document.body.classList.add('mobile');
-    // If share is supported, show share button
-    if (!navigator?.share) document.body.classList.add('no-share');
-    // Get more items when click on button
-    ['more', 'back', 'share', 'close', 'config'].forEach((action) =>
-      document.querySelectorAll(`.button-${action}`).forEach((el) => el.addEventListener('click', () => menuButton(action)))
-    );
-    // Add placeholder to all items with data-placeholder attribute and label for all elements with data-label attribute
-    document.body.querySelectorAll('[data-placeholder]').forEach((el) => el.setAttribute('placeholder', getLabel(el.getAttribute('data-placeholder'))));
-    document.body.querySelectorAll('[data-label]').forEach((el) => (el.innerText = getLabel(el.getAttribute('data-label'))));
-    // update text of time every 5 second
-    setInterval(() => document.querySelectorAll('[data-timestamp]').forEach((el) => (el.innerText = dateText(el.getAttribute('data-timestamp')))), 5000);
-    // Create scrollables Items
+    // Set the document title using a function
+    setDocumentTitle('title');
+
+    // Apply polyfill for functions not supported on all browsers
+    applyPolyfill();
+
+    // Check if the application is running on a mobile device and add a corresponding class to the body
+    addMobileClass();
+
+    // Check if the share feature is supported and add a class to the body accordingly
+    addShareClass();
+
+    // Add event listeners to various buttons
+    addEventListenersToButtons();
+
+    // Set placeholders and labels for elements with data-placeholder and data-label attributes
+    setPlaceholdersAndLabels();
+
+    // Update the text of elements with data-timestamp attribute periodically
+    updateTimestampText();
+
+    // Create scrollable items
     createScrollableItems();
-    // Config Form: Add close config event and email change event
-    document.getElementById('config-button-close').addEventListener('click', () => closeConfig());
-    document.getElementById('config-email-input').addEventListener('change', (event) => localStorage.setItem('email', event.target.value));
-    // Create Categories
+
+    // Add event listeners for configuration form
+    addConfigFormEventListeners();
+
+    // Create categories
     createCategories();
-    // Set filter state
-    if (JSON.parse(localStorage.getItem('filter') ?? '[]').length > 0) document.body.classList.add('filter-on');
+
+    // Set filter state based on local storage
+    setFilterState();
+
     // Load items
-    getData({ useCache: true });
+    loadData({ useCache: true });
   } catch (err) {
-    errorLog('init', err);
+    logError('init', err);
   }
 };
 
-// Error log
-const errorLog = (location, err, label) => {
-  if (LAST_ERROR.type === `${location}-${label}` && Date.now() - LAST_ERROR.time < 2500) return;
-  LAST_ERROR.type = `${location}-${label}`;
-  LAST_ERROR.time = Date.now();
-  console.log(`${location} error:`, err);
-  showToast(label ? getLabel(label) : `${getLabel('errorIn')} ${location}`);
+// Function to set the document title
+const setDocumentTitle = (label) => {
+  document.title = getLabel(label);
 };
 
-// Close config window
+// Function to apply polyfill for unsupported functions
+const applyPolyfill = () => {
+  polyfill();
+};
+
+// Function to add mobile class to body if running on mobile
+const addMobileClass = () => {
+  if (isMobile()) {
+    document.body.classList.add('mobile');
+  }
+};
+
+// Function to add no-share class to body if share feature is not supported
+const addShareClass = () => {
+  if (!navigator?.share) {
+    document.body.classList.add('no-share');
+  }
+};
+
+// Function to add event listeners to various buttons
+const addEventListenersToButtons = () => {
+  ['more', 'back', 'share', 'close', 'config'].forEach((action) =>
+    document.querySelectorAll(`.button-${action}`).forEach((el) =>
+      el.addEventListener('click', () => menuButton(action))
+    )
+  );
+};
+
+// Function to set placeholders and labels for elements
+const setPlaceholdersAndLabels = () => {
+  document.body.querySelectorAll('[data-placeholder]').forEach((el) =>
+    el.setAttribute('placeholder', getLabel(el.getAttribute('data-placeholder')))
+  );
+  document.body.querySelectorAll('[data-label]').forEach((el) =>
+    (el.innerText = getLabel(el.getAttribute('data-label')))
+  );
+};
+
+// Function to update the text of elements with data-timestamp attribute periodically
+const updateTimestampText = () => {
+  setInterval(() => {
+    document.querySelectorAll('[data-timestamp]').forEach((el) =>
+      (el.innerText = dateText(el.getAttribute('data-timestamp')))
+    );
+  }, 5000);
+};
+
+// Function to add event listeners for configuration form
+const addConfigFormEventListeners = () => {
+  document.getElementById('config-button-close').addEventListener('click', () => closeConfig());
+  document.getElementById('config-email-input').addEventListener('change', (event) =>
+    localStorage.setItem('email', event.target.value)
+  );
+};
+
+// Function to set filter state based on local storage
+const setFilterState = () => {
+  if (JSON.parse(localStorage.getItem('filter') ?? '[]').length > 0) {
+    document.body.classList.add('filter-on');
+  }
+};
+
+// Function to load data
+const loadData = ({ useCache }) => {
+  getData({ useCache });
+};
+
+// Function to log errors
+const logError = (context, error) => {
+  errorLog(context, error);
+};
+
+// Error log function
+const errorLog = (location, err, label) => {
+  try {
+    // Check if the last error occurred in the same location and within 2.5 seconds
+    if (LAST_ERROR.type === `${location}-${label}` && Date.now() - LAST_ERROR.time < 2500) return;
+    
+    // Update last error details
+    LAST_ERROR.type = `${location}-${label}`;
+    LAST_ERROR.time = Date.now();
+    
+    // Log the error
+    console.log(`${location} error:`, err);
+    
+    // Show toast notification with error message
+    showToast(label ? getLabel(label) : `${getLabel('errorIn')} ${location}`);
+  } catch (error) {
+    console.error('Error while logging error:', error);
+  }
+};
+
+// Function to close configuration window
 const closeConfig = () => {
   try {
+    // Get old and new filter values from local storage
     const oldFilter = localStorage.getItem('old-filter') ?? '[]';
     const newFilter = localStorage.getItem('filter') ?? '[]';
     const filter = JSON.parse(newFilter);
-    // Set filter state
-    if (filter.length > 0) document.body.classList.add('filter-on');
-    else document.body.classList.remove('filter-on');
+    
+    // Update filter state
+    if (filter.length > 0) {
+      document.body.classList.add('filter-on');
+    } else {
+      document.body.classList.remove('filter-on');
+    }
+    
     // If filter changed, filter the current data
     if (oldFilter !== newFilter) {
       let data = localStorage.getItem('last-data');
+      
+      // Process data if available
       if (data) {
         data = JSON.parse(data);
+        // Filter items based on the updated filter
         data.feeds = data.feeds.filter((item) => {
           const { sourceId } = item;
           const source = data.sources.find((source) => source.id === sourceId);
           return !filter.includes(source.type);
         });
-        // Use data to update items
+        // Use filtered data to update items
         processItems(data);
       }
     }
+    
     // Save new filter as old filter and close config
     localStorage.setItem('old-filter', newFilter);
     document.body.classList.remove('show-config');
   } catch (err) {
+    // If an error occurs, close config window and log the error
     document.body.classList.remove('show-config');
     errorLog('closeConfig', err);
   }
 };
 
-// Add or remove categories
+// Function to handle changes in category inputs
 const inputCategoryChange = (el) => {
   try {
     const { checked } = el;
     const id = parseInt(el.dataset.id);
-    // Read categories and remove or add category, then save in local storage
+    
+    // Read current filter from local storage
     let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
-    let position = filter.indexOf(id);
-    if (checked && position >= 0) filter.splice(position, 1);
-    else if (!checked && !filter.includes(id)) filter.push(id);
-    // Order and save
+    
+    // Add or remove category based on checked status
+    if (checked) {
+      const position = filter.indexOf(id);
+      if (position >= 0) {
+        filter.splice(position, 1);
+      }
+    } else {
+      if (!filter.includes(id)) {
+        filter.push(id);
+      }
+    }
+    
+    // Sort and save the updated filter
     filter.sort((a, b) => a - b);
     localStorage.setItem('filter', JSON.stringify(filter));
   } catch (err) {
+    // If an error occurs, log it
     errorLog('inputChange', err);
   }
 };
 
-/* Create categories in config form */
+// Function to create categories in the config form
 const createCategories = () => {
-  const [categories, categoryPill] = ['config-categories', 'category-pill-template'].map((id) => document.getElementById(id));
+  const categoriesContainer = document.getElementById('config-categories');
+  const categoryPillTemplate = document.getElementById('category-pill-template');
+  
   try {
-    // Config - Select All - Deselect All
-    const setChecked = (el, state) => ((el.checked = state), inputCategoryChange(el));
-    document
-      .getElementById('config-categories-button-select-all')
-      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el) => setChecked(el, true)));
-    document
-      .getElementById('config-categories-button-deselect-all')
-      .addEventListener('click', () => document.querySelectorAll('#config-categories input').forEach((el, idx) => setChecked(el, idx == 0)));
-    // Change evet
+    // Helper function to set checkbox state and trigger change event
+    const setChecked = (el, state) => {
+      el.checked = state;
+      inputCategoryChange(el);
+    };
+    
+    // Event listener for "Select All" button
+    document.getElementById('config-categories-button-select-all').addEventListener('click', () => {
+      document.querySelectorAll('#config-categories input').forEach((el) => setChecked(el, true));
+    });
+    
+    // Event listener for "Deselect All" button
+    document.getElementById('config-categories-button-deselect-all').addEventListener('click', () => {
+      document.querySelectorAll('#config-categories input').forEach((el, idx) => setChecked(el, idx == 0));
+    });
+    
+    // Event listener for category click
     const clickEvent = (event) => {
       event.stopPropagation();
       if (document.querySelectorAll('.category-pill input:checked').length === 0) event.preventDefault();
       else inputCategoryChange(event.target);
     };
-    // List of categories
-    let newPill;
+    
+    // Create category pills
     for (let i = 1; i < CATEGORIES.length; i++) {
-      newPill = document.createElement('div');
-      newPill.innerHTML = categoryPill.innerHTML.replace('{{category}}', getLabel(CATEGORIES[i]));
+      const newPill = document.createElement('div');
+      newPill.innerHTML = categoryPillTemplate.innerHTML.replace('{{category}}', getLabel(CATEGORIES[i]));
       const pill = newPill.firstElementChild;
       pill.style.backgroundColor = `var(--color-${i})`;
       pill.dataset.id = i;
@@ -127,136 +255,170 @@ const createCategories = () => {
       input.dataset.id = i;
       pill.addEventListener('click', () => pill.querySelector('input').click());
       input.addEventListener('click', (event) => clickEvent(event));
-      categories.appendChild(pill);
+      categoriesContainer.appendChild(pill);
     }
   } catch (err) {
-    categories.innerHTML = '';
+    // Clear categories container and log error
+    categoriesContainer.innerHTML = '';
     errorLog('createCategories', err);
   }
 };
 
-// Open config window
+// Function to open config window
 const openConfig = () => {
   try {
+    // Save old filter state
     localStorage.setItem('old-filter', localStorage.getItem('filter') ?? '[]');
-    // Set email
+    
+    // Set email input value
     document.getElementById('config-email-input').value = localStorage.getItem('email') ?? '';
-    // Set categories
+    
+    // Set category checkboxes
     let filter = JSON.parse(localStorage.getItem('filter') ?? '[]');
     document.querySelectorAll('.category-pill input[data-id]').forEach((el) => {
       const { id } = el.dataset;
       el.checked = !filter.includes(parseInt(id));
     });
-    // Show config
+    
+    // Show config window
     document.body.classList.add('show-config');
   } catch (err) {
+    // Log error
     errorLog('openConfig', err);
   }
 };
 
-// Simple toast
+// Function to show toast notification
 const showToast = (message) => {
   try {
+    // Close existing toasts
     document.body.querySelectorAll('.toast-close').forEach((el) => el.click());
+    
+    // Create new toast element
     const toastContainer = document.createElement('div');
     toastContainer.innerHTML = document.getElementById('toast-template').innerHTML.replaceAll('{{message}}', message);
     const toast = toastContainer.firstElementChild;
-    toast.addEventListener('click', () => (toast.classList.remove('show'), setTimeout(() => toast.remove(), 750)));
+    
+    // Event listener to close toast on click
+    toast.addEventListener('click', () => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 750);
+    });
+    
+    // Append toast to body and show it
     document.body.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
   } catch (err) {
+    // Log error
     errorLog('showToast', err);
   }
 };
 
-// Close iframe
+// Function to close the iframe
 const closeIframe = () => {
-  document.body.classList.remove('iframe-loading', 'iframe-open', 'iframe-error', 'iframe-ready', 'iframe-no-url');
-  setTimeout(() => document.getElementById('item-iframe')?.remove(), 500);
+  try {
+    const classesToRemove = ['iframe-loading', 'iframe-open', 'iframe-error', 'iframe-ready', 'iframe-no-url'];
+    document.body.classList.remove(...classesToRemove);
+    setTimeout(() => {
+      const iframe = document.getElementById('item-iframe');
+      if (iframe) iframe.remove();
+    }, 500);
+  } catch (err) {
+    errorLog('closeIframe', err);
+  }
 };
 
-// Open url on iframe
+// Function to open URL on iframe
 const openOnIframe = (values) => {
   try {
+    const { url } = values;
     document.body.classList.add('iframe-open', 'iframe-loading');
-    // Check if url is present
-    if (values.url == '') {
+    if (!url) {
       document.body.classList.add('iframe-no-url');
+      return;
     }
-    // Add item preventing iframe load error
-    let iFrame = document.getElementById('iframe-item');
-    values = { ...values, iFrame }; // Clean replace, used only on items list
-    iFrame.innerHTML = '';
-    addItem(values);
-    // Create and set iframe
-    iFrame = createIframe(values);
+    const iFrame = createIframe(values);
     if (!iFrame) {
       document.body.classList.remove('iframe-loading');
       document.body.classList.add('iframe-error');
       return;
     }
-    // Wait for iframe load (Interval 250 to 750)
     const start = Date.now();
     const checkIfReady = () => {
-      // Loading finished
-      if ((iFrame.contentWindow?.length ?? 0) > 0) {
+      if (iFrame.contentWindow?.length) {
         document.body.classList.remove('iframe-loading');
         document.body.classList.add('iframe-ready');
-        return;
-      }
-      //
-      if (Date.now() - start < 1000) setTimeout(checkIfReady, 250);
-      else {
+      } else if (Date.now() - start < 1000) {
+        setTimeout(checkIfReady, 250);
+      } else {
         document.body.classList.remove('iframe-loading');
         document.body.classList.add('iframe-error');
       }
     };
-    // Start Check
     setTimeout(checkIfReady, 250);
   } catch (err) {
     errorLog('openOnIframe', err);
   }
 };
 
-// Create iframe and open url
+// Function to create iframe and open URL
 const createIframe = (values) => {
   try {
     const { url } = values;
-    if (url == '') return;
+    if (!url) return null;
     const iFrameItem = document.getElementById('item-iframe');
-    iFrameItem && iFrameItem.remove();
+    if (iFrameItem) iFrameItem.remove();
     const iframe = document.createElement('iframe');
-    Object.assign(iframe, { id: 'item-iframe', allowfullscreen: 'false', referrerpolicy: 'same-origin', sandbox: 'allow-same-origin allow-scripts', src: url });
+    Object.assign(iframe, {
+      id: 'item-iframe',
+      allowfullscreen: 'false',
+      referrerpolicy: 'same-origin',
+      sandbox: 'allow-same-origin allow-scripts',
+      src: url
+    });
     iframe.classList.add('w-100vw', 'full-height', 'border-none');
     document.getElementById('iframe-iframe').appendChild(iframe);
     return iframe;
   } catch (err) {
     errorLog('createIframe', err);
+    return null;
   }
 };
 
-// Create scrollable items
+// Function to create scrollable items
 const createScrollableItems = () => {
-  // Add goto top functionalities on scrollable items (Defined by class scrollable)
-  // Inside scrollable items, must manually add scroll button with class goto-top (Used to scroll to top)
-  const scrollableItems = document.querySelectorAll('.scrollable');
-  scrollableItems &&
-    scrollableItems.forEach((el) =>
-      el.addEventListener('scroll', (e) => (e.target.scrollTop > 20 ? el.classList.add('on-scroll') : el.classList.remove('on-scroll')))
-    );
-  document
-    .querySelectorAll('.goto-top')
-    .forEach((el) => el.addEventListener('click', (evt) => (evt.stopPropagation(), evt.preventDefault(), gotoTop(el.parentElement))));
+  try {
+    const scrollableItems = document.querySelectorAll('.scrollable');
+    scrollableItems.forEach((el) => {
+      el.addEventListener('scroll', () => {
+        if (el.scrollTop > 20) {
+          el.classList.add('on-scroll');
+        } else {
+          el.classList.remove('on-scroll');
+        }
+      });
+    });
+    const gotoTopButtons = document.querySelectorAll('.goto-top');
+    gotoTopButtons.forEach((el) => {
+      el.addEventListener('click', (evt) => {
+        evt.stopPropagation();
+        evt.preventDefault();
+        gotoTop(el.parentElement);
+      });
+    });
+  } catch (err) {
+    errorLog('createScrollableItems', err);
+  }
 };
 
-// Share from iframe
+// Function to share from iframe
 const shareIframe = () => {
   try {
     const iframeOpen = document.body.classList.contains('iframe-open');
     if (!iframeOpen) return;
     const item = document.getElementById('iframe-item').querySelector('.list-item .item');
     if (!item) return;
-    const { id, url } = item?.dataset ?? {};
+    const { id, url } = item.dataset || {};
     const title = item.querySelector('.title')?.innerText;
     const summary = (item.querySelector('.summary')?.innerText?.substring(0, 255) ?? '') + '...';
     share({ id, type: 'all', url, title, summary });
@@ -265,162 +427,200 @@ const shareIframe = () => {
   }
 };
 
-// Open new webbrowser window with url from iframe
+// Function to open a new web browser window with URL from iframe
 const openWeb = (values) => {
-  if ((values?.url ?? values) == '') return;
-  window.open(values?.url ?? values, '_blank');
-  closeIframe();
+  try {
+    const url = values?.url ?? values;
+    if (!url) return;
+    window.open(url, '_blank');
+    closeIframe();
+  } catch (err) {
+    errorLog('openWeb', err);
+  }
 };
 
-// Actions on menu button click
+// Function to handle menu button actions
 const menuButton = (action) => {
-  const inactive =
-    document.body.classList.contains('iframe-open') || document.body.classList.contains('show-config') || document.body.classList.contains('items-loading');
-  if (action === 'back' && !inactive) getData({ itemsBack: LAST_READED ?? 999999999999 });
-  else if (action === 'more' && !inactive) getData({});
-  else if (action === 'config' && !inactive) openConfig();
-  else if (action === 'share') shareIframe();
-  else if (action === 'close') closeIframe();
-};
-
-// Make element response when visible
-const respondWhenVisible = (element, ignoreIfClass, callback) => {
-  const options = { root: document.body };
-  // Create observer to check item visibility
-  const observer = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (entry.intersectionRatio > 0) {
-        if (ignoreIfClass && document.body.classList.contains(ignoreIfClass)) return;
-        observer.disconnect();
-        callback();
+  try {
+    const inactive =
+      document.body.classList.contains('iframe-open') ||
+      document.body.classList.contains('show-config') ||
+      document.body.classList.contains('items-loading');
+    if (!inactive) {
+      switch (action) {
+        case 'back':
+          getData({ itemsBack: LAST_READED ?? 999999999999 });
+          break;
+        case 'more':
+          getData({});
+          break;
+        case 'config':
+          openConfig();
+          break;
+        case 'share':
+          shareIframe();
+          break;
+        case 'close':
+          closeIframe();
+          break;
+        default:
+          break;
       }
-    });
-  }, options);
-  // Start watching
-  observer.observe(element);
+    }
+  } catch (err) {
+    errorLog('menuButton', err);
+  }
 };
 
-// Set item as readed
+// Function to make an element respond when visible
+const respondWhenVisible = (element, ignoreIfClass, callback) => {
+  try {
+    const options = { root: document.body };
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.intersectionRatio > 0) {
+          if (ignoreIfClass && document.body.classList.contains(ignoreIfClass)) return;
+          observer.disconnect();
+          callback();
+        }
+      });
+    }, options);
+    observer.observe(element);
+  } catch (err) {
+    errorLog('respondWhenVisible', err);
+  }
+};
+
+// Function to mark an item as read
 const setReaded = (feedsId) => {
-  if (!feedsId) return;
-  // If is in Back mode, don't send
-  if (document.body.classList.contains('items-back')) return;
-  // Send readed items to API
-  const body = JSON.stringify({ feedsId });
-  fetchWithTimeout(API_READED_URL, { method: 'POST', headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' }, body }).catch((err) =>
-    errorLog('setReaded', err, 'errorMarkReaded')
-  );
+  try {
+    if (!feedsId || document.body.classList.contains('items-back')) return;
+    const body = JSON.stringify({ feedsId });
+    fetchWithTimeout(API_READED_URL, {
+      method: 'POST',
+      headers: { 'x-user': currentUser(), 'Content-Type': 'application/json' },
+      body
+    }).catch((err) => errorLog('setReaded', err, 'errorMarkReaded'));
+  } catch (err) {
+    errorLog('setReaded', err);
+  }
 };
 
-// Get current user (Or set if not exists)
+// Function to get the current user (or set if not exists)
 const currentUser = () => {
-  let user = localStorage.getItem('user');
-  if (!user) {
-    user = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    localStorage.setItem('user', user);
+  try {
+    let user = localStorage.getItem('user');
+    if (!user) {
+      user = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('user', user);
+    }
+    return user;
+  } catch (err) {
+    errorLog('currentUser', err);
+    return null;
   }
-  return user;
 };
 
-// Remove listaneer from element (Clonnig it)
-const removeListener = (el) => el.parentNode.replaceChild(el.cloneNode(true), el);
+// Function to remove listener from element (cloning it)
+const removeListener = (el) => {
+  try {
+    const clonedEl = el.cloneNode(true);
+    el.parentNode.replaceChild(clonedEl, el);
+  } catch (err) {
+    errorLog('removeListener', err);
+  }
+};
 
-// Get email to send with one click
+// Function to get email to send with one click
 const currentEmail = (callback) => {
-  let email = localStorage.getItem('email');
-  if (!email) {
-    // Clean email input
-    const inputEmail = document.getElementById('input-email').querySelector('input');
-    inputEmail.value = email ?? '';
-    // Show input email
-    document.body.classList.add('show-input-email');
-    // Remove listener and add new one (For cancel)
-    removeListener(document.getElementById('input-email-btn-cancel'));
-    document.getElementById('input-email-btn-cancel').addEventListener('click', () => document.body.classList.remove('show-input-email'));
-    // Remove listener and add new one (For continue)
-    removeListener(document.getElementById('input-email-btn-continue'));
-    document.getElementById('input-email-btn-continue').addEventListener('click', () => {
-      const email = inputEmail.value;
-      email && localStorage.setItem('email', email);
-      callback && callback(email);
-      document.body.classList.remove('show-input-email');
-    });
-    return;
+  try {
+    let email = localStorage.getItem('email');
+    if (!email) {
+      const inputEmail = document.getElementById('input-email').querySelector('input');
+      inputEmail.value = email ?? '';
+      document.body.classList.add('show-input-email');
+      removeListener(document.getElementById('input-email-btn-cancel'));
+      document.getElementById('input-email-btn-cancel').addEventListener('click', () => document.body.classList.remove('show-input-email'));
+      removeListener(document.getElementById('input-email-btn-continue'));
+      document.getElementById('input-email-btn-continue').addEventListener('click', () => {
+        const email = inputEmail.value;
+        if (email) localStorage.setItem('email', email);
+        callback && callback(email);
+        document.body.classList.remove('show-input-email');
+      });
+      return;
+    }
+    callback && callback(email);
+  } catch (err) {
+    errorLog('currentEmail', err);
   }
-  callback && callback(email);
 };
 
-// Create item from data and add to list
+// Function to get item data
 const getItemData = (item, sources) => {
   try {
     const { id, link: url, title, content, publish } = item;
     const { name: sourceName, icon: sourceIcon, type: sourceType } = sources.find((source) => source.id === item.sourceId);
     const author = item?.authors?.[0] ?? item?.author ?? '';
     const timestamp = new Date(new Date(publish).getTime() + new Date().getTimezoneOffset() * -1 * 60000).getTime();
-    const summary = (content ?? '').trim() != '' ? content : item.summary;
+    const summary = (content ?? '').trim() !== '' ? content : item.summary;
     const image = getFirstImage(item.images);
     const sourceTypeLabel = getLabel(CATEGORIES[sourceType] ?? `TYPE-${sourceType}`);
     const date = dateText(timestamp);
-    return { id, url, author, title, summary, sourceName, sourceIcon, timestamp, date, sourceType, sourceTypeLabel, image }; //
+    return { id, url, author, title, summary, sourceName, sourceIcon, timestamp, date, sourceType, sourceTypeLabel, image };
   } catch (err) {
     errorLog('getItemData', err);
     return null;
   }
 };
 
-// Get first valid image from array of images
+// Function to get the first valid image from an array of images
 const getFirstImage = (images) => {
-  if (!images || images.length == 0) return null;
+  if (!images || images.length === 0) return null;
   for (let i = 0; i < images.length; i++) {
     if (images[i].url) return images[i].url;
   }
   return null;
 };
 
-// Get data from API
-const getData = ({ itemsBack = '', useCache = false }) => {
-  // start load items
-  document.body.classList.add('items-loading');
-
-  // Data received from API
-  let data = null;
-
-  // Set if working with back data or not
-  if (itemsBack) document.body.classList.add('items-back');
-  else document.body.classList.remove('items-back');
-
-  // Call to API
-  fetchWithTimeout(
-    API_ITEMS_URL.replace('{{count}}', 20)
-      .replace('{{itemsBack}}', itemsBack)
-      .replace('{{filter}}', JSON.parse(localStorage.getItem('filter') ?? '[]').join(',')),
-    { method: 'GET', headers: { 'x-user': currentUser() } }
-  )
-    .then(async (response) => {
-      // Get data from response
-      response = await response.json();
-      if (response.status !== 'success') throw Error('internal-error');
-      // Received and ready to proced
-      data = { ...response };
-      localStorage.setItem('last-data', JSON.stringify(data));
-    })
-    .catch((err) => {
-      errorLog('procesing', { err }, 'errorRefreshing');
-      if (useCache) data = JSON.parse(localStorage.getItem('last-data') ?? null);
-    })
-    .finally(() => {
-      try {
-        processItems(data);
-      } catch (err) {
-        errorLog('procesing', err, 'errorProcessing');
-      }
-      // Finish items loading
-      document.body.classList.remove('items-loading');
-      document.body.classList.remove('loading');
-    });
+// Function to get data from the API
+const getData = async ({ itemsBack = '', useCache = false }) => {
+  try {
+    // Start loading
+    document.body.classList.add('items-loading');
+    let data = null;
+    
+    // We are working with old data
+    if (itemsBack) document.body.classList.add('items-back');
+    else document.body.classList.remove('items-back');
+    
+    // Call to the API
+    const response = await fetchWithTimeout(
+      API_ITEMS_URL.replace('{{count}}', 20)
+        .replace('{{itemsBack}}', itemsBack)
+        .replace('{{filter}}', JSON.parse(localStorage.getItem('filter') ?? '[]').join(',')),
+      { method: 'GET', headers: { 'x-user': currentUser() } }
+    );
+    const responseData = await response.json();
+    if (responseData.status !== 'success') throw Error('internal-error');
+    // Received data and ready to proceed
+    data = { ...responseData };
+    localStorage.setItem('last-data', JSON.stringify(data));
+    processItems(data);
+  } catch (err) {
+    errorLog('getData', err);
+    if (useCache) {
+      data = JSON.parse(localStorage.getItem('last-data') ?? null);
+      if (data) processItems(data);
+    }
+  } finally {
+    // Finishing loading
+    document.body.classList.remove('items-loading');
+    document.body.classList.remove('loading');
+  }
 };
 
-// Call to API to get items with timeout
+// Function to make a call to the API with a timeout
 const fetchWithTimeout = async (resource, options = {}) => {
   try {
     const { timeout = 8000 } = options;
@@ -453,16 +653,16 @@ const dateText = (timestamp) => {
   }
 };
 
-// Image loaded correctly - Then check if it's small
+// Check if the image loaded correctly and then check if it's small
 const imageCheck = (type, item, img) => {
   try {
     if (img.naturalWidth <= 1 || img.naturalHeight <= 1) imageError(type, item, img);
-    else if (type == 'source-icon' && img.width <= 64) item.querySelectorAll('.list-item .source-name').forEach((el) => el.classList.remove('hide'));
-    else if (type == 'image' && img.naturalWidth <= 400) item.classList.add('image-small');
-    else if (type == 'image' && img.naturalHeight > img.naturalWidth) item.classList.add('image-small', 'image-vertical');
-    else if (type == 'image') item.classList.remove('image-small');
+    else if (type === 'source-icon' && img.width <= 64) item.querySelectorAll('.list-item .source-name').forEach((el) => el.classList.remove('hide'));
+    else if (type === 'image' && img.naturalWidth <= 400) item.classList.add('image-small');
+    else if (type === 'image' && img.naturalHeight > img.naturalWidth) item.classList.add('image-small', 'image-vertical');
+    else if (type === 'image') item.classList.remove('image-small');
     // Need to set max-height for small images to respect aspect ratio (Max 50% of width)
-    if (type == 'image' && item.classList.contains('image-small')) {
+    if (type === 'image' && item.classList.contains('image-small')) {
       let maxHeight = parseInt(25 / (img.naturalWidth / img.naturalHeight));
       if (maxHeight > 50) maxHeight = 50;
       img.style.maxHeight = `${maxHeight}vw`;
@@ -480,20 +680,18 @@ const getLabel = (label) => LABELS[label] ?? `*${label}*`;
 function convertToPlain(html) {
   var tempDivElement = document.createElement('div');
   tempDivElement.innerHTML = html;
-  return (tempDivElement.textContent || tempDivElement.innerText || '').replace(/<[^>]*>/g, '').replaceAll("replace('$'", '');
+  return (tempDivElement.textContent || tempDivElement.innerText || '').replace(/<[^>]*>/g, '');
 }
 
 // Add item to list
 const addItem = (values) => {
   if (values.id == null) return errorLog('addItem', { error: 'id is null' }, values);
   try {
-    // Convert summary to plain text (And remove replace('$')
+    // Convert summary to plain text
     values.summary = convertToPlain(values.summary);
     values.title = convertToPlain(values.title);
     // Get values
     let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, insertOn } = values;
-    // TEST: Custom image
-    // image = "https://s.w.org/images/core/emoji/14.0.0/72x72/1f534.png";
     // Replace values in template
     let html = ITEM_TEMPLATE.innerHTML;
     ['author', 'date', 'id', 'idx', 'image', 'sourceIcon', 'sourceName', 'sourceType', 'sourceTypeLabel', 'summary', 'timestamp', 'title', 'url'].forEach(
@@ -509,7 +707,7 @@ const addItem = (values) => {
       if (document.body.classList.contains('items-loading')) return;
       iFrame ? openWeb(values) : openOnIframe({ ...values, insertOn: null, iFrame: null });
     });
-    if (url == '') item.classList.add('no-url');
+    if (url === '') item.classList.add('no-url');
     if (iFrame) item.classList.add('iframe-mode');
     item.classList.add('list-item');
     item.innerHTML = html;
@@ -523,7 +721,7 @@ const addItem = (values) => {
           el.addEventListener('error', (evt) => imageError(type, item, evt.target));
           el.addEventListener('load', (evt) => imageCheck(type, item, evt.target));
           el.setAttribute('src', img);
-        } else if (idx == 0) {
+        } else if (idx === 0) {
           // No image
           item.classList.add('no-image');
           imageError(type, item, el);
@@ -577,29 +775,29 @@ const processItems = (data) => {
     const { sources, feeds: items } = data ?? { sources: [], feeds: [] };
     // Start scroll to top animation
     gotoTop(ITEMS_CONTAINER, 'processing-items');
-    // Mark items to be remove
+    // Mark items to be removed
     [...document.querySelectorAll('.list-item')].forEach((item) => item.classList.add('to-remove'));
     const itemsToRemove = [...document.querySelectorAll('.list-item.to-remove')];
     // Add new items (Replacing old ones) and remove remaining
-    const procceedItems = [];
+    const processedItems = [];
     if (items && items.length > 0) {
       items.forEach((item, idx) => {
-        procceedItems.push({ id: item.id, published: item.publish });
+        processedItems.push({ id: item.id, published: item.publish });
         addItem({ idx, ...getItemData(item, sources), insertOn: itemsToRemove.shift() ?? null });
       });
       LAST_READED = items[0].id;
     }
     // DEBUG: Show items processed
-    // console.log('Items processed:', procceedItems);
+    // console.log('Items processed:', processedItems);
     // Remove remaining items
     itemsToRemove && itemsToRemove.forEach((item) => item.remove());
-    // If no items, add class to body or remove, if exists
+    // If no items, add class to body or remove if exists
     if (!items || items.length === 0) document.body.classList.add('no-items');
     else document.body.classList.remove('no-items');
-    // Set as readed the first 3 items
-    const readedToSend = [];
-    items?.slice(0, 3)?.forEach((item) => readedToSend.push(item.id));
-    if (readedToSend.length > 0) setReaded(readedToSend.join(','));
+    // Set as read the first 3 items
+    const readToSend = [];
+    items?.slice(0, 3)?.forEach((item) => readToSend.push(item.id));
+    if (readToSend.length > 0) setReaded(readToSend.join(','));
   } catch (err) {
     errorLog('processItems', err);
   }
@@ -619,7 +817,7 @@ const gotoTop = (el, addClass) => {
   const scrollNow = () => {
     try {
       const scroll = el.scrollTop;
-      // Stop if scroll end
+      // Stop if scroll ends
       if (scroll <= 0) {
         if (addClass) document.body.classList.remove(addClass);
         el.classList.remove('scrolling');
@@ -640,19 +838,26 @@ const gotoTop = (el, addClass) => {
 
 // Polyfills
 const polyfill = () => {
+  // Check if the replaceAll method is available, if not, polyfill it
   if (!String.prototype.replaceAll) {
     String.prototype.replaceAll = function (str, newStr) {
+      // If str is a regular expression, use the native replace method
       if (Object.prototype.toString.call(str).toLowerCase() === '[object regexp]') return this.replace(str, newStr);
+      // Otherwise, use a regular expression with global flag to replace all occurrences
       return this.replace(new RegExp(str, 'g'), newStr);
     };
   }
 };
 
 // Constants
+// Initialize LAST_READED to null
 let LAST_READED = null;
+// Define API URLs using template literals
 const API_ITEMS_URL = `${BASE_URL}/feeds?count={{count}}&back={{itemsBack}}&filter={{filter}}`;
 const API_READED_URL = `${BASE_URL}/feeds-readed`;
+// Get references to HTML elements by their IDs and assign them to variables
 const [ITEM_TEMPLATE, ITEMS_CONTAINER] = ['item-template', 'list-items-container'].map((id) => document.getElementById(id));
+
 
 // Labels
 const LABELS = {
