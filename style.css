@@ -435,7 +435,7 @@ body.no-items .list-no-items {
 }
 .list-item.image-small .item-image {
   padding-top: 0.25rem;
-  max-width: 35vw;
+  max-width: 25vw;
 }
 @media screen and (min-width: 640px) {
   .list-item.image-small .item-image {

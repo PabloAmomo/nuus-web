@@ -463,9 +463,10 @@ const imageCheck = (type, item, img) => {
     else if (type == 'image') item.classList.remove('image-small');
     // Need to set max-height for small images to respect aspect ratio (Max 50% of width)
     if (type == 'image' && item.classList.contains('image-small')) {
-      let maxHeight = parseInt(35 / (img.naturalWidth / img.naturalHeight));
+      let maxHeight = parseInt(25 / (img.naturalWidth / img.naturalHeight));
       if (maxHeight > 50) maxHeight = 50;
       img.style.maxHeight = `${maxHeight}vw`;
+      img.style.width = `100%`;
     }
   } catch (err) {
     errorLog('imageCheck', err);
@@ -490,6 +491,8 @@ const addItem = (values) => {
     values.summary = convertToPlain(values.summary);
     // Get values
     let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, insertOn } = values;
+    // TEST: Custom image
+    // image = "https://s.w.org/images/core/emoji/14.0.0/72x72/1f534.png";
     // Replace values in template
     let html = ITEM_TEMPLATE.innerHTML;
     ['author', 'date', 'id', 'idx', 'image', 'sourceIcon', 'sourceName', 'sourceType', 'sourceTypeLabel', 'summary', 'timestamp', 'title', 'url'].forEach(
