@@ -466,7 +466,8 @@ const imageCheck = (type, item, img) => {
       let maxHeight = parseInt(25 / (img.naturalWidth / img.naturalHeight));
       if (maxHeight > 50) maxHeight = 50;
       img.style.maxHeight = `${maxHeight}vw`;
-      img.style.width = `100%`;
+      img.style.aspectRatio = `${img.naturalWidth}/${img.naturalHeight}`;
+      // img.style.width = `100%`; (Not needed, solved with aspect ratio)
     }
   } catch (err) {
     errorLog('imageCheck', err);
@@ -490,10 +491,13 @@ const addItem = (values) => {
     // Convert summary to plain text (And remove replace('$')
     values.summary = convertToPlain(values.summary);
     values.title = convertToPlain(values.title);
+    values.author = convertToPlain(values.author);
     // Get values
     let { idx, id, url, title, summary, image, sourceIcon, sourceType, iFrame, insertOn } = values;
-    // TEST: Custom image
-    // image = "https://s.w.org/images/core/emoji/14.0.0/72x72/1f534.png";
+    // TEST: Custom image (DEBUG)
+    // image = "https://ichef.bbci.co.uk/news/240/cpsprodpb/398b/live/a9b1cb50-d7e8-11ee-908e-43ce8c45f0a5.jpg"; // Imagen pequeña maduro.
+    // values.author = ' <div class="editorial-container__name">Salud y Familia</div> <p class="news-with-big-headline-container__author">Andrea Jumique Castillo</p> <div class="editorial-container__date"><span class="posted-on"><time class="sart-time entry-date published updated" datetime="2024-02-23T16:56:08-06:00">23 de febrero de 2024</time></span></div>'
+    // values.author = convertToPlain(values.author);
     // Replace values in template
     let html = ITEM_TEMPLATE.innerHTML;
     ['author', 'date', 'id', 'idx', 'image', 'sourceIcon', 'sourceName', 'sourceType', 'sourceTypeLabel', 'summary', 'timestamp', 'title', 'url'].forEach(
