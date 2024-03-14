@@ -521,8 +521,8 @@ const addItem = (values) => {
     // Add image events, and then, load image
     ['.item-image', '.source img'].forEach((selector, idx) => {
       item.querySelectorAll(selector).forEach((el) => {
-        const type = ['image', 'source-icon'][idx];
-        const img = [image, sourceIcon][idx];
+        let type = ['image', 'source-icon'][idx];
+        let img = [image, sourceIcon][idx];
         if (img) {
           el.addEventListener('error', (evt) => imageError(type, item, evt.target));
           el.addEventListener('load', (evt) => imageCheck(type, item, evt.target));
