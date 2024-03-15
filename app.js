@@ -490,6 +490,11 @@ const addItem = (values) => {
   try {
     // Convert summary to plain text (And remove replace('$')
     values.summary = convertToPlain(values.summary);
+    // TEST: Debug TEST (DEBUG)
+    // values.summary = ``;
+    values.summary = values.summary.replaceAll("${", '$');
+    values.summary = values.summary.replaceAll("$'", '$');
+    values.summary = values.summary.replaceAll("$\"", '$');
     values.title = convertToPlain(values.title);
     values.author = convertToPlain(values.author);
     // Get values
