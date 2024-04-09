@@ -607,6 +607,7 @@ const processItems = (data) => {
     else document.body.classList.remove('no-items');
     // Set as readed the items in viewport
     const readedToSend = [];
+    items?.slice(0, 3)?.forEach((item) => readedToSend.push(item.id));
     items.forEach((item) => {
       let itemEl = document.querySelector(`.list-item [data-id="${item.id}"]`);
       if (isInViewport(itemEl)) { readedToSend.push(item.id); }
