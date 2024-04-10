@@ -169,10 +169,15 @@ const showToast = (message) => {
   }
 };
 
+// Remove iframe
+const removeIframe = () => {
+  document.getElementById('item-iframe')?.remove();
+};
+
 // Close iframe
 const closeIframe = () => {
   document.body.classList.remove('iframe-loading', 'iframe-open', 'iframe-error', 'iframe-ready', 'iframe-no-url');
-  setTimeout(() => document.getElementById('item-iframe')?.remove(), 500);
+  setTimeout(() => removeIframe(), 500);
 };
 
 // Open url on iframe
@@ -207,6 +212,7 @@ const openOnIframe = (values) => {
       //
       if (Date.now() - start < 1000) setTimeout(checkIfReady, 250);
       else {
+        removeIframe();
         document.body.classList.remove('iframe-loading');
         document.body.classList.add('iframe-error');
       }

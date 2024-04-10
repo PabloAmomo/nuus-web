@@ -375,11 +375,11 @@ body.no-items .list-no-items {
     flex-direction: row !important;
     flex-wrap: wrap;
   }
-  body.mobile .list-item {
+  body.mobile .list-item:not(.iframe-mode) {
     /* Force 2 items per row when landscape */
     max-width: calc(50% - var(--list-gap)) !important;
   }
-  .list-item {
+  .list-item:not(.iframe-mode) {
     max-width: calc(50% - var(--list-gap));
   }
   .iframe-mode.list-item {
