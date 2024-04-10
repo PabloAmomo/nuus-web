@@ -491,7 +491,7 @@ function convertToPlain(html) {
 }
 // Add item to list
 const cleanExhoticChars = (text) => {
-  return values.summary.replaceAll('${', '$').replaceAll("$'", '$').replaceAll('$"', '$');
+  return text.replaceAll('${', '$').replaceAll("$'", '$').replaceAll('$"', '$');
 };
 
 // Add item to list
